@@ -5,12 +5,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
 // Replace with your real Supabase project credentials from your Supabase Dashboard
-const SUPABASE_URL = 'https://lvxzpglyxhseflafqhfh.supabase.co/rest/v1/';       // e.g. https://xyzcompany.supabase.co
+const SUPABASE_URL = 'https://lvxzpglyxhseflafqhfh.supabase.co';       // e.g. https://xyzcompany.supabase.co
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2eHpwZ2x5eGhzZWZsYWZxaGZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4OTI3NDgsImV4cCI6MjEwNzQ2ODc0OH0.-3RgAyeEwtIi0istMZ0hhV0YltxQtHpRL2gm484JBrs'; // your anon/public key
 
 // Site configuration
 export const SITE = {
-  name: 'Prodation',
+  name: 'Probation',
   currency: 'Rs.',
   currencyCode: 'PKR',
 };
@@ -23,9 +23,9 @@ export function formatPrice(amount) {
 const DEFAULT_PRODUCTS = [
   {
     id: 'prod-001',
-    name: 'Prodation Heavyweight Script Hoodie',
-    slug: 'prodation-heavyweight-script-hoodie',
-    description: 'Heavyweight custom-milled fleece hoodie in heather grey with signature cursive "Prodation" script embroidery on chest. Relaxed streetwear fit with double-layered hood and ribbed cuffs.',
+    name: 'Probation Heavyweight Script Hoodie',
+    slug: 'probation-heavyweight-script-hoodie',
+    description: 'Heavyweight custom-milled fleece hoodie in heather grey with signature cursive "Probation" script embroidery on chest. Relaxed streetwear fit with double-layered hood and ribbed cuffs.',
     price: 6500,
     compare_price: 7500,
     category: 'hoodie',
@@ -45,9 +45,9 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 'prod-002',
-    name: 'Prodation Wide-Leg Sweatpants',
-    slug: 'prodation-wide-leg-sweatpants',
-    description: 'Relaxed wide-leg heather grey sweatpants with embroidered cursive Prodation logo at hip and botanical leaf motif near the bottom hem. Elastic waistband with flat cotton drawstrings.',
+    name: 'Probation Wide-Leg Sweatpants',
+    slug: 'probation-wide-leg-sweatpants',
+    description: 'Relaxed wide-leg heather grey sweatpants with embroidered cursive Probation logo at hip and botanical leaf motif near the bottom hem. Elastic waistband with flat cotton drawstrings.',
     price: 5500,
     compare_price: null,
     category: 'joggers',
@@ -65,8 +65,8 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 'prod-003',
-    name: 'Prodation Signature Tracksuit Set',
-    slug: 'prodation-signature-tracksuit-set',
+    name: 'Probation Signature Tracksuit Set',
+    slug: 'probation-signature-tracksuit-set',
     description: 'Complete 2-piece heavyweight heather grey fleece set including the signature script hoodie and wide-leg sweatpants. Engineered for an effortless, premium streetwear silhouette.',
     price: 11000,
     compare_price: 12000,
@@ -86,8 +86,8 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 'prod-004',
-    name: 'Prodation Statement Back-Print Hoodie',
-    slug: 'prodation-statement-backprint-hoodie',
+    name: 'Probation Statement Back-Print Hoodie',
+    slug: 'probation-statement-backprint-hoodie',
     description: 'Statement drop featuring high-density red and weathered black typography: "LOVE\'S GONNA GET YOU KILLED BUT PRIDE\'S GONNA BE THE DEATH OF YOU" across the back panel.',
     price: 6800,
     compare_price: null,
@@ -110,7 +110,7 @@ const DEFAULT_PRODUCTS = [
 // Helper for local mock storage
 function getLocalData(key, fallback) {
   try {
-    const raw = localStorage.getItem(`prodation_${key}`);
+    const raw = localStorage.getItem(`probation_${key}`);
     return raw ? JSON.parse(raw) : fallback;
   } catch {
     return fallback;
@@ -119,7 +119,7 @@ function getLocalData(key, fallback) {
 
 function setLocalData(key, data) {
   try {
-    localStorage.setItem(`prodation_${key}`, JSON.stringify(data));
+    localStorage.setItem(`probation_${key}`, JSON.stringify(data));
   } catch (e) {
     console.error('Storage error:', e);
   }
@@ -127,10 +127,10 @@ function setLocalData(key, data) {
 
 // Local mock client for instant offline preview & testing
 function createMockClient() {
-  if (!localStorage.getItem('prodation_products')) {
+  if (!localStorage.getItem('probation_products')) {
     setLocalData('products', DEFAULT_PRODUCTS);
   }
-  if (!localStorage.getItem('prodation_orders')) {
+  if (!localStorage.getItem('probation_orders')) {
     setLocalData('orders', [
       {
         id: 'ord-1001',
@@ -162,12 +162,12 @@ function createMockClient() {
       }
     ]);
   }
-  if (!localStorage.getItem('prodation_order_items')) {
+  if (!localStorage.getItem('probation_order_items')) {
     setLocalData('order_items', [
       {
         id: 'item-1',
         order_id: 'ord-1001',
-        product_name: 'Prodation Signature Tracksuit Set',
+        product_name: 'Probation Signature Tracksuit Set',
         size: 'L',
         quantity: 1,
         unit_price: 11000
@@ -175,7 +175,7 @@ function createMockClient() {
       {
         id: 'item-2',
         order_id: 'ord-1002',
-        product_name: 'Prodation Heavyweight Script Hoodie',
+        product_name: 'Probation Heavyweight Script Hoodie',
         size: 'M',
         quantity: 1,
         unit_price: 6500
@@ -186,22 +186,22 @@ function createMockClient() {
   return {
     auth: {
       async getSession() {
-        const adminLoggedIn = localStorage.getItem('prodation_admin_session') === 'true';
+        const adminLoggedIn = localStorage.getItem('probation_admin_session') === 'true';
         return {
           data: {
-            session: adminLoggedIn ? { user: { email: 'admin@prodation.com' } } : null
+            session: adminLoggedIn ? { user: { email: 'admin@probation.com' } } : null
           }
         };
       },
       async signInWithPassword({ email, password }) {
         if (email && password) {
-          localStorage.setItem('prodation_admin_session', 'true');
+          localStorage.setItem('probation_admin_session', 'true');
           return { data: { user: { email } }, error: null };
         }
         return { data: null, error: { message: 'Invalid credentials' } };
       },
       async signOut() {
-        localStorage.removeItem('prodation_admin_session');
+        localStorage.removeItem('probation_admin_session');
         return { error: null };
       }
     },

@@ -2,7 +2,7 @@
 // Cart — localStorage cart management
 // ============================================
 
-const CART_KEY = 'prodation_cart';
+const CART_KEY = 'probation_cart';
 
 /**
  * Get all cart items

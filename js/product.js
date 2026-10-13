@@ -35,7 +35,7 @@ async function loadProduct() {
     if (error || !data) throw error || new Error('Product not found');
     
     currentProduct = data;
-    document.title = `${data.name} - Prodation`;
+    document.title = `${data.name} - Probation`;
     
     renderProductDetail(data, container);
     loadRelatedProducts(data.category, data.id);
