@@ -47,8 +47,9 @@ async function loadProduct() {
 }
 
 function renderProductDetail(product, container) {
-  // Ensure product.sizes and product.stock are arrays/objects if they exist, or fallback
-  const sizes = product.sizes || ['S', 'M', 'L', 'XL'];
+  // Limit sizes to S, M, L
+  const allowedSizes = ['S', 'M', 'L'];
+  const sizes = (product.sizes || allowedSizes).filter(s => allowedSizes.includes(s));
   const stock = product.stock || {};
   
   // Also handle extra images if they exist in DB (assuming an array, or fallback to single)
@@ -78,6 +79,49 @@ function renderProductDetail(product, container) {
     <button type="button" class="gallery-nav-btn next" id="galleryNext" aria-label="Next image">&#8250;</button>
   ` : '';
 
+  const isSweatpants = product.category === 'sweatpants' || product.category === 'joggers';
+  const isSet = product.category === 'set';
+
+  let specsListHtml = `
+    <ul class="product-specs-list">
+      <li>100% Heavy-Weight Cotton (380 GSM)</li>
+      <li>Oversized Fit</li>
+      <li>Embroidered Logo on Hoodie</li>
+      <li>DTF Print at The Back</li>
+      <li>Kangaroo Pocket</li>
+    </ul>
+    <div class="model-details-badge">
+      <strong>Model Details:</strong> The Model is Wearing Size Large; Model Height: 6'1
+    </div>
+  `;
+
+  if (isSweatpants) {
+    specsListHtml = `
+      <ul class="product-specs-list">
+        <li>100% Heavy-Weight Cotton (380 GSM)</li>
+        <li>Relaxed Wide-Leg Streetwear Fit</li>
+        <li>Embroidered Cursive Logo at Hip</li>
+        <li>Botanical Leaf Motif Embroidery near Ankle</li>
+        <li>Deep Pockets & Elastic Waistband with Flat Drawstrings</li>
+      </ul>
+      <div class="model-details-badge">
+        <strong>Model Details:</strong> The Model is Wearing Size Large; Model Height: 6'1
+      </div>
+    `;
+  } else if (isSet) {
+    specsListHtml = `
+      <p style="font-weight: 600; color: #fff; margin-bottom: 8px;">Complete 2-Piece Heavyweight Streetwear Set (Hoodie + Sweatpants)</p>
+      <ul class="product-specs-list">
+        <li>100% Heavy-Weight Cotton (380 GSM)</li>
+        <li>Oversized Fit Hoodie with DTF Back Print & Kangaroo Pocket</li>
+        <li>Matching Wide-Leg Sweatpants with Embroidered Hip & Ankle Details</li>
+      </ul>
+      <div class="model-details-badge">
+        <strong>Model Details:</strong> The Model is Wearing Size Large; Model Height: 6'1
+      </div>
+    `;
+  }
+
   container.innerHTML = `
     <div class="product-gallery fade-in visible">
       <div id="mainImage" class="product-gallery-main">
@@ -95,11 +139,14 @@ function renderProductDetail(product, container) {
       </div>
       
       <div id="productDescription" class="product-description">
-        ${product.description || 'Premium quality streetwear.'}
+        ${specsListHtml}
       </div>
       
-      <div id="sizeSelector" class="size-selector">
-        <div class="form-label">SIZE</div>
+      <div id="sizeSelector" class="size-selector" style="margin-top: 24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div class="form-label" style="margin-bottom:0;">SELECT SIZE</div>
+          <a href="#sizeGuideSection" class="size-guide-btn-link">Size Guide 📏</a>
+        </div>
         <div class="size-options">
           ${sizeHtml}
         </div>
@@ -116,8 +163,157 @@ function renderProductDetail(product, container) {
         <button id="addToCartBtn" class="btn btn-primary btn-full btn-lg">ADD TO CART</button>
       </div>
       <button id="buyNowBtn" class="btn btn-secondary btn-full btn-lg">BUY NOW</button>
+
+      <div class="exclusivity-notice">
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <div>
+          <strong>Limited Drop Notice</strong>
+          When one design sells out, it never comes back in stock.
+        </div>
+      </div>
+    </div>
+
+    ${renderSizeGuide(product.category)}
+  `;
+  
+  setupInteractions(images);
+}
+
+function renderSizeGuide(category) {
+  const isSweatpants = category === 'sweatpants' || category === 'joggers';
+  const isSet = category === 'set';
+
+  const hoodieTable = `
+    <div style="margin-bottom: ${isSet ? '28px' : '0'};">
+      <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">HOODIE SIZE GUIDE</h4>
+      <div class="size-table-container">
+        <table class="size-table">
+          <thead>
+            <tr>
+              <th>SIZE</th>
+              <th>CHEST (A)</th>
+              <th>LENGTH (B)</th>
+              <th>SHOULDER (C)</th>
+              <th>SLEEVE LENGTH (D)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="size-col">S</td>
+              <td>23" (58.4 cm)</td>
+              <td>27" (68.6 cm)</td>
+              <td>21" (53.3 cm)</td>
+              <td>33" (83.8 cm)</td>
+            </tr>
+            <tr>
+              <td class="size-col">M</td>
+              <td>24" (61.0 cm)</td>
+              <td>28" (71.1 cm)</td>
+              <td>22" (55.9 cm)</td>
+              <td>34" (86.4 cm)</td>
+            </tr>
+            <tr>
+              <td class="size-col">L</td>
+              <td>25" (63.5 cm)</td>
+              <td>29" (73.7 cm)</td>
+              <td>23" (58.4 cm)</td>
+              <td>35" (88.9 cm)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="size-guide-note">All measurements in inches (cm in brackets). Sleeve length is measured from centre back.</p>
     </div>
   `;
+
+  const sweatpantsTable = `
+    <div>
+      <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">SWEATPANTS SIZE GUIDE</h4>
+      <div class="size-table-container">
+        <table class="size-table">
+          <thead>
+            <tr>
+              <th>SIZE</th>
+              <th>WAIST (A)</th>
+              <th>HIP (B)</th>
+              <th>THIGH (C)</th>
+              <th>LEG OPENING (D)</th>
+              <th>LENGTH (E)</th>
+              <th>FRONT RISE (F)</th>
+              <th>BACK RISE (G)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="size-col">S</td>
+              <td>27" (68.6 cm)</td>
+              <td>36" (91.4 cm)</td>
+              <td>22" (55.9 cm)</td>
+              <td>8.5" (21.6 cm)</td>
+              <td>38" (96.5 cm)</td>
+              <td>12" (30.5 cm)</td>
+              <td>15.5" (39.4 cm)</td>
+            </tr>
+            <tr>
+              <td class="size-col">M</td>
+              <td>29" (73.7 cm)</td>
+              <td>38" (96.5 cm)</td>
+              <td>24" (61.0 cm)</td>
+              <td>9" (22.9 cm)</td>
+              <td>40" (101.6 cm)</td>
+              <td>12.5" (31.8 cm)</td>
+              <td>16" (40.6 cm)</td>
+            </tr>
+            <tr>
+              <td class="size-col">L</td>
+              <td>31" (78.7 cm)</td>
+              <td>40" (101.6 cm)</td>
+              <td>26" (66.0 cm)</td>
+              <td>9.5" (24.1 cm)</td>
+              <td>42" (106.7 cm)</td>
+              <td>13" (33.0 cm)</td>
+              <td>16.5" (41.9 cm)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="size-guide-note">All measurements in inches (cm in brackets). F = front rise, G = back rise.</p>
+    </div>
+  `;
+
+  let diagramSrc = '/images/size-charts/hoodie-size-guide.webp';
+  if (isSweatpants) {
+    diagramSrc = '/images/size-charts/sweatpants-size-guide.webp';
+  } else if (isSet) {
+    diagramSrc = '/images/size-charts/full-size-guide.webp';
+  }
+
+  return `
+    <section class="size-guide-section" id="sizeGuideSection">
+      <div class="size-guide-header">
+        <h3>
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.3 15.3l-6.6-6.6a2 2 0 0 0-2.8 0L2.7 17.9a2 2 0 0 0 0 2.8l3.6 3.6a2 2 0 0 0 2.8 0l9.2-9.2a2 2 0 0 0 0-2.8z"/>
+            <path d="M6.5 13.5l1.5 1.5M10.5 9.5l1.5 1.5M14.5 5.5l1.5 1.5"/>
+          </svg>
+          Size Guide & Measurements
+        </h3>
+        <span class="text-secondary" style="font-size:0.8rem">Official Probation Streetwear Sizing</span>
+      </div>
+      <div class="size-guide-grid">
+        <div>
+          ${isSet ? hoodieTable + sweatpantsTable : (isSweatpants ? sweatpantsTable : hoodieTable)}
+        </div>
+        <div class="size-guide-image">
+          <img src="${diagramSrc}" alt="Size Guide Diagram" loading="lazy">
+        </div>
+      </div>
+    </section>
+  `;
+}
   
   setupInteractions(images);
 }

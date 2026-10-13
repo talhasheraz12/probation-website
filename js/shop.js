@@ -53,7 +53,12 @@ function renderProducts(category = 'all') {
   
   const filteredProducts = category === 'all' 
     ? allProducts 
-    : allProducts.filter(p => p.category === category);
+    : allProducts.filter(p => {
+        if (category === 'sweatpants' || category === 'joggers') {
+          return p.category === 'sweatpants' || p.category === 'joggers';
+        }
+        return p.category === category;
+      });
     
   if (filteredProducts.length === 0) {
     grid.innerHTML = '<p class="text-secondary" style="grid-column: 1 / -1; text-align: center;">No products found in this category.</p>';

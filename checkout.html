@@ -9,18 +9,40 @@
 </head>
 <body>
   <!-- Nav -->
-  <div class="announcement-bar"><p>LIMITED RELEASES. EXCLUSIVE DROPS.</p></div>
-  <nav class="navbar"><div class="container navbar-inner">
-    <a href="/" class="nav-brand">PROBATION</a>
-    <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
-    <div class="nav-links">
-      <a href="/">Home</a><a href="/shop.html">Shop</a><a href="/about.html">About</a><a href="/contact.html">Contact</a>
+    <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    LIMITED DROPS &bull; WHEN ONE DESIGN SELLS OUT IT NEVER COMES BACK IN STOCK
+  </div>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/shop.html">Shop</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="nav-brand-center">
+        <a href="/"><img src="/images/logo.png" alt="Probation" class="navbar-logo-img"></a>
+      </div>
+      <div class="nav-right">
+        <a href="/cart.html" class="cart-link">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+      </div>
     </div>
-    <a href="/cart.html" class="cart-link">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      <span class="cart-badge" id="cartBadge">0</span>
-    </a>
-  </div></nav>
+  </header>
   <div class="nav-overlay"></div>
 
   <!-- Main Content -->
