@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prodation - Dark Streetwear</title>
+  <meta name="description" content="LIMITED RELEASES. EXCLUSIVE DROPS. STYLE. VIBE. REFLECT.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    LIMITED RELEASES. EXCLUSIVE DROPS.
+  </div>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <div class="nav-brand">
+        <a href="/">PRODATION</a>
+      </div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/shop.html">Shop</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="nav-right">
+        <a href="/cart.html" class="cart-link">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-overlay"></div>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-bg" style="background-image: url('/images/hero/hero-main.webp');"></div>
+      <div class="hero-content fade-in">
+        <h1 class="hero-title">STYLE. VIBE. REFLECT.</h1>
+        <p class="hero-subtitle">Designed to disrupt. Wear your statement.</p>
+        <a href="/shop.html" class="btn btn-primary btn-lg">SHOP NOW</a>
+      </div>
+    </section>
+
+    <!-- Marquee Ticker -->
+    <div class="marquee">
+      <div class="marquee-track">
+        <div class="marquee-content">
+          LIMITED EDITION <span class="dot"></span> NEW ARRIVAL <span class="dot"></span> PRODATION <span class="dot"></span> EXCLUSIVE DROP <span class="dot"></span>
+        </div>
+        <div class="marquee-content">
+          LIMITED EDITION <span class="dot"></span> NEW ARRIVAL <span class="dot"></span> PRODATION <span class="dot"></span> EXCLUSIVE DROP <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline Section -->
+    <section class="section tagline-section fade-in">
+      <div class="container">
+        <h2>DESIGNED TO DISRUPT</h2>
+        <p>Prodation brings you the boldest designs and most exclusive drops. Wear your statement with premium quality streetwear that sets you apart from the crowd.</p>
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="section">
+      <div class="container">
+        <div class="flex-between" style="margin-bottom: 24px;">
+          <h2 class="text-upper">FEATURED</h2>
+          <a href="/shop.html" class="btn-ghost" style="text-transform: uppercase; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.1em;">VIEW ALL</a>
+        </div>
+        <div id="featuredProducts" class="product-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Split Brand Section -->
+    <section class="split-section fade-in">
+      <div class="split-image">
+        <img src="/images/brand/brand-story.webp" alt="Prodation Brand Story" loading="lazy">
+      </div>
+      <div class="split-content">
+        <h2>PRODATION</h2>
+        <p>Our philosophy is simple: create bold, unapologetic streetwear for those who dare to stand out. Every piece is a statement.</p>
+        <div class="quote">Love's gonna get you killed but pride's gonna be the death of you</div>
+      </div>
+    </section>
+
+    <!-- Marquee Ticker 2 -->
+    <div class="marquee" style="margin-top: 2px;">
+      <div class="marquee-track">
+        <div class="marquee-content">
+          LIMITED EDITION <span class="dot"></span> NEW ARRIVAL <span class="dot"></span> PRODATION <span class="dot"></span> EXCLUSIVE DROP <span class="dot"></span>
+        </div>
+        <div class="marquee-content">
+          LIMITED EDITION <span class="dot"></span> NEW ARRIVAL <span class="dot"></span> PRODATION <span class="dot"></span> EXCLUSIVE DROP <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4 class="nav-brand" style="margin-bottom: 8px;">PRODATION</h4>
+          <p>STYLE. VIBE. REFLECT.</p>
+          <p style="margin-top: 8px;">Designed to disrupt.</p>
+        </div>
+        <div class="footer-col">
+          <h4>SHOP</h4>
+          <a href="/shop.html">All Products</a>
+          <a href="/shop.html?cat=hoodie">Hoodies</a>
+          <a href="/shop.html?cat=joggers">Joggers</a>
+        </div>
+        <div class="footer-col">
+          <h4>INFO</h4>
+          <a href="/about.html">About Us</a>
+          <a href="/contact.html">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>FOLLOW US</h4>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">Instagram</a>
+            <a href="#" aria-label="TikTok">TikTok</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Prodation. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { supabase, formatPrice } from './js/supabase-config.js';
+    
+    async function loadFeaturedProducts() {
+      const grid = document.getElementById('featuredProducts');
+      grid.innerHTML = '<div class="loading-spinner" style="margin: 20px auto; display: block; grid-column: 1 / -1;"></div>';
+      
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('active', true)
+          .eq('featured', true)
+          .limit(4);
+          
+        if (error) throw error;
+        
+        if (!data || data.length === 0) {
+          grid.innerHTML = '<p class="text-secondary" style="grid-column: 1 / -1;">No featured products found.</p>';
+          return;
+        }
+        
+        grid.innerHTML = data.map(product => `
+          <div class="product-card fade-in">
+            <div class="product-card-img">
+              <a href="/product.html?slug=${product.slug}">
+                <img src="${(product.images && product.images[0]) || product.image_url || '/images/hero/hero-main.webp'}" alt="${product.name}" loading="lazy">
+              </a>
+              ${product.compare_price ? '<span class="product-card-badge">Sale</span>' : ''}
+            </div>
+            <div class="product-card-body">
+              <div class="product-card-name">
+                <a href="/product.html?slug=${product.slug}">${product.name}</a>
+              </div>
+              <div class="product-card-price">
+                ${formatPrice(product.price)}
+                ${product.compare_price ? `<span class="compare">${formatPrice(product.compare_price)}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+        
+        // Trigger fade-in observer (since elements were added dynamically)
+        // main.js observer will catch them if we re-trigger or just add .visible immediately
+        // For simplicity, add visible immediately to dynamically loaded content in viewport
+        setTimeout(() => {
+          document.querySelectorAll('#featuredProducts .fade-in').forEach(el => el.classList.add('visible'));
+        }, 50);
+        
+      } catch (err) {
+        console.error('Error fetching featured products:', err);
+        grid.innerHTML = '<p class="text-error" style="grid-column: 1 / -1;">Failed to load featured products.</p>';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadFeaturedProducts);
+  </script>
+</body>
+</html>

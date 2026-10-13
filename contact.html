@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - Prodation</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    LIMITED RELEASES. EXCLUSIVE DROPS.
+  </div>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <div class="nav-brand">
+        <a href="/">PRODATION</a>
+      </div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/shop.html">Shop</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="nav-right">
+        <a href="/cart.html" class="cart-link">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <button class="nav-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="nav-overlay"></div>
+
+  <main class="container section">
+    <div class="page-header fade-in">
+      <h1>GET IN TOUCH</h1>
+      <p>Have a question or feedback? We'd love to hear from you.</p>
+    </div>
+    
+    <div class="product-detail fade-in"> <!-- Using product-detail for 2-column layout -->
+      <!-- Contact Form -->
+      <div>
+        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="admin-card">
+          <div class="form-group">
+            <label class="form-label" for="name">Name</label>
+            <input type="text" id="name" name="name" class="form-input" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-input" placeholder="Your email address" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="message">Message</label>
+            <textarea id="message" name="message" class="form-textarea" placeholder="How can we help you?" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">SEND MESSAGE</button>
+        </form>
+      </div>
+      
+      <!-- Contact Info -->
+      <div style="padding: 24px;">
+        <h3 style="margin-bottom: 16px;">CUSTOMER SUPPORT</h3>
+        <p class="text-secondary" style="margin-bottom: 24px;">Our support team is available Monday to Friday. We aim to respond to all inquiries within 24-48 hours.</p>
+        
+        <div style="margin-bottom: 24px;">
+          <h4 style="margin-bottom: 8px;">EMAIL</h4>
+          <p class="text-accent">support@prodation.com</p>
+        </div>
+        
+        <div>
+          <h4 style="margin-bottom: 8px;">SOCIAL MEDIA</h4>
+          <div class="footer-social">
+            <a href="#" class="text-secondary" style="text-decoration: underline;">Instagram</a>
+            <a href="#" class="text-secondary" style="text-decoration: underline;">TikTok</a>
+            <a href="#" class="text-secondary" style="text-decoration: underline;">Twitter</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4 class="nav-brand" style="margin-bottom: 8px;">PRODATION</h4>
+          <p>STYLE. VIBE. REFLECT.</p>
+          <p style="margin-top: 8px;">Designed to disrupt.</p>
+        </div>
+        <div class="footer-col">
+          <h4>SHOP</h4>
+          <a href="/shop.html">All Products</a>
+          <a href="/shop.html?cat=hoodie">Hoodies</a>
+          <a href="/shop.html?cat=joggers">Joggers</a>
+        </div>
+        <div class="footer-col">
+          <h4>INFO</h4>
+          <a href="/about.html">About Us</a>
+          <a href="/contact.html">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>FOLLOW US</h4>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">Instagram</a>
+            <a href="#" aria-label="TikTok">TikTok</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Prodation. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

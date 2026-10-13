@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart - Prodation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Nav -->
+  <div class="announcement-bar"><p>LIMITED RELEASES. EXCLUSIVE DROPS.</p></div>
+  <nav class="navbar"><div class="container navbar-inner">
+    <a href="/" class="nav-brand">PRODATION</a>
+    <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <div class="nav-links">
+      <a href="/">Home</a><a href="/shop.html">Shop</a><a href="/about.html">About</a><a href="/contact.html">Contact</a>
+    </div>
+    <a href="/cart.html" class="cart-link">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </a>
+  </div></nav>
+  <div class="nav-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="container section">
+    <div class="page-header text-center">
+      <h1>YOUR CART</h1>
+    </div>
+
+    <div id="emptyCartState" class="cart-empty hidden">
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't added anything to your cart yet.</p>
+      <a href="/shop.html" class="btn btn-primary">CONTINUE SHOPPING</a>
+    </div>
+
+    <div id="cartLayout" class="cart-layout hidden">
+      <div class="cart-items" id="cartItems">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="cart-summary">
+        <h3>ORDER SUMMARY</h3>
+        <div class="cart-summary-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">Rs. 0</span>
+        </div>
+        <div class="cart-summary-row">
+          <span>Shipping</span>
+          <span>Calculated at checkout</span>
+        </div>
+        <div class="cart-summary-row total">
+          <span>Total</span>
+          <span id="cartTotal">Rs. 0</span>
+        </div>
+        <a href="/checkout.html" class="btn btn-primary btn-full">PROCEED TO CHECKOUT</a>
+        <a href="/shop.html" class="btn btn-outline btn-full" style="margin-top: 12px;">CONTINUE SHOPPING</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <a href="/" class="nav-brand" style="margin-bottom: 16px; display: inline-block;">PRODATION</a>
+          <p>Premium streetwear for the bold.</p>
+        </div>
+        <div class="footer-col">
+          <h4>SHOP</h4>
+          <a href="/shop.html">All Products</a>
+          <a href="/shop.html?category=tees">Tees</a>
+          <a href="/shop.html?category=hoodies">Hoodies</a>
+        </div>
+        <div class="footer-col">
+          <h4>SUPPORT</h4>
+          <a href="/contact.html">Contact Us</a>
+          <a href="#">Shipping Policy</a>
+          <a href="#">Returns</a>
+        </div>
+        <div class="footer-col">
+          <h4>FOLLOW US</h4>
+          <div class="footer-social">
+            <a href="#">Instagram</a>
+            <a href="#">TikTok</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 PRODATION. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { getCart, removeFromCart, updateQuantity, getCartTotal } from '/js/cart.js';
+    import { formatPrice } from '/js/supabase-config.js';
+
+    const cartLayout = document.getElementById('cartLayout');
+    const emptyCartState = document.getElementById('emptyCartState');
+    const cartItemsContainer = document.getElementById('cartItems');
+    const cartSubtotalEl = document.getElementById('cartSubtotal');
+    const cartTotalEl = document.getElementById('cartTotal');
+
+    function renderCart() {
+      const cart = getCart();
+      
+      if (cart.length === 0) {
+        cartLayout.classList.add('hidden');
+        emptyCartState.classList.remove('hidden');
+        return;
+      }
+
+      cartLayout.classList.remove('hidden');
+      emptyCartState.classList.add('hidden');
+
+      cartItemsContainer.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <a href="/product.html?slug=${item.slug || item.productId}" class="cart-item-img">
+            <img src="${item.image}" alt="${item.name}">
+          </a>
+          <div class="cart-item-details">
+            <div class="cart-item-name">
+              <a href="/product.html?slug=${item.slug || item.productId}">${item.name}</a>
+            </div>
+            <div class="cart-item-meta">Size: ${item.size}</div>
+            <div class="cart-item-bottom">
+              <div class="quantity-selector" style="margin-bottom: 0;">
+                <button type="button" class="qty-btn" data-action="decrease" data-id="${item.productId}" data-size="${item.size}">-</button>
+                <input type="number" value="${item.quantity}" readonly>
+                <button type="button" class="qty-btn" data-action="increase" data-id="${item.productId}" data-size="${item.size}">+</button>
+              </div>
+              <div style="text-align: right;">
+                <div class="cart-item-price">${formatPrice(item.price * item.quantity)}</div>
+                <button type="button" class="cart-item-remove" data-id="${item.productId}" data-size="${item.size}">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      const total = getCartTotal();
+      const formattedTotal = formatPrice(total);
+      cartSubtotalEl.textContent = formattedTotal;
+      cartTotalEl.textContent = formattedTotal;
+    }
+
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('cart-item-remove')) {
+        const id = e.target.getAttribute('data-id');
+        const size = e.target.getAttribute('data-size');
+        removeFromCart(id, size);
+        renderCart();
+      }
+
+      if (e.target.classList.contains('qty-btn')) {
+        const id = e.target.getAttribute('data-id');
+        const size = e.target.getAttribute('data-size');
+        const action = e.target.getAttribute('data-action');
+        
+        const cart = getCart();
+        const item = cart.find(i => i.productId === id && i.size === size);
+        if (item) {
+          let newQty = item.quantity;
+          if (action === 'increase') newQty++;
+          if (action === 'decrease') newQty--;
+          
+          if (newQty > 0) {
+            updateQuantity(id, size, newQty);
+          } else {
+            removeFromCart(id, size);
+          }
+          renderCart();
+        }
+      }
+    });
+
+    // Listen to updates from other tabs/scripts
+    window.addEventListener('cart-updated', renderCart);
+
+    renderCart();
+  </script>
+</body>
+</html>

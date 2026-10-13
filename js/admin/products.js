@@ -1,0 +1,232 @@
+import { supabase, formatPrice } from '../supabase-config.js';
+
+// Utilities
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function generateSlug(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+// Global scope logic depending on current page
+const isProductsPage = window.location.pathname.includes('/admin/products.html');
+const isProductEditPage = window.location.pathname.includes('/admin/product-edit.html');
+
+if (isProductsPage) {
+  const tableBody = document.getElementById('productsTable');
+
+  async function loadProducts() {
+    const { data: products, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    tableBody.innerHTML = '';
+    
+    products.forEach(product => {
+      const tr = document.createElement('tr');
+      const imgUrl = product.images && product.images.length > 0 ? product.images[0] : '';
+      const stockTotal = Object.values(product.stock || {}).reduce((a, b) => a + Number(b), 0);
+      
+      tr.innerHTML = `
+        <td><img src="${imgUrl}" alt="${product.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI1MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzMzMyIvPjwvc3ZnPg=='" /></td>
+        <td>${product.name}</td>
+        <td style="text-transform:capitalize">${product.category}</td>
+        <td>${formatPrice(product.price)}</td>
+        <td>${stockTotal}</td>
+        <td>
+          <label class="toggle-switch">
+            <input type="checkbox" class="toggle-featured" data-id="${product.id}" ${product.featured ? 'checked' : ''}>
+            <span class="toggle-slider"></span>
+          </label>
+        </td>
+        <td>
+          <label class="toggle-switch">
+            <input type="checkbox" class="toggle-active" data-id="${product.id}" ${product.active ? 'checked' : ''}>
+            <span class="toggle-slider"></span>
+          </label>
+        </td>
+        <td>
+          <a href="/admin/product-edit.html?id=${product.id}" class="btn btn-sm btn-secondary">Edit</a>
+          <button class="btn btn-sm btn-outline delete-product" data-id="${product.id}">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  tableBody.addEventListener('change', async (e) => {
+    if (e.target.classList.contains('toggle-featured')) {
+      const id = e.target.getAttribute('data-id');
+      await supabase.from('products').update({ featured: e.target.checked }).eq('id', id);
+    }
+    if (e.target.classList.contains('toggle-active')) {
+      const id = e.target.getAttribute('data-id');
+      await supabase.from('products').update({ active: e.target.checked }).eq('id', id);
+    }
+  });
+
+  tableBody.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('delete-product')) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        const id = e.target.getAttribute('data-id');
+        await supabase.from('products').delete().eq('id', id);
+        loadProducts();
+      }
+    }
+  });
+
+  loadProducts();
+}
+
+if (isProductEditPage) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('id');
+  
+  const form = document.getElementById('productForm');
+  const nameInput = document.getElementById('name');
+  const slugInput = document.getElementById('slug');
+  const uploadZone = document.getElementById('imageUploadZone');
+  const fileInput = document.getElementById('imageInput');
+  const previewGrid = document.getElementById('imagePreviewGrid');
+  
+  let uploadedImages = [];
+  
+  if (productId) {
+    document.getElementById('pageTitle').textContent = 'Edit Product';
+    loadProductForEdit(productId);
+  }
+
+  nameInput.addEventListener('input', () => {
+    if (!productId || slugInput.value === '') {
+      slugInput.value = generateSlug(nameInput.value);
+    }
+  });
+
+  async function loadProductForEdit(id) {
+    const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single();
+    if (product) {
+      nameInput.value = product.name;
+      slugInput.value = product.slug;
+      document.getElementById('description').value = product.description;
+      document.getElementById('price').value = product.price;
+      document.getElementById('compare_price').value = product.compare_price || '';
+      document.getElementById('category').value = product.category;
+      document.getElementById('stockS').value = product.stock?.S || 0;
+      document.getElementById('stockM').value = product.stock?.M || 0;
+      document.getElementById('stockL').value = product.stock?.L || 0;
+      document.getElementById('stockXL').value = product.stock?.XL || 0;
+      document.getElementById('stockXXL').value = product.stock?.XXL || 0;
+      document.getElementById('featured').checked = product.featured;
+      document.getElementById('active').checked = product.active;
+      
+      if (product.images) {
+        uploadedImages = [...product.images];
+        renderImagePreviews();
+      }
+    }
+  }
+
+  // Image Upload Logic
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = 'var(--accent)'; });
+  uploadZone.addEventListener('dragleave', e => { e.preventDefault(); uploadZone.style.borderColor = 'var(--border)'; });
+  uploadZone.addEventListener('drop', async e => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'var(--border)';
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+  async function handleFiles(files) {
+    for (let file of files) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+      
+      const { data, error } = await supabase.storage.from('product-images').upload(filePath, file);
+      if (error) {
+        showToast('Image upload failed', 'error');
+        console.error(error);
+      } else {
+        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(filePath);
+        uploadedImages.push(publicUrl);
+        renderImagePreviews();
+      }
+    }
+  }
+
+  function renderImagePreviews() {
+    previewGrid.innerHTML = '';
+    uploadedImages.forEach((url, index) => {
+      const item = document.createElement('div');
+      item.className = 'image-preview-item';
+      item.innerHTML = `
+        <img src="${url}" alt="Preview">
+        <button type="button" class="remove-img" data-index="${index}">×</button>
+      `;
+      previewGrid.appendChild(item);
+    });
+  }
+
+  previewGrid.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-img')) {
+      const index = e.target.getAttribute('data-index');
+      uploadedImages.splice(index, 1);
+      renderImagePreviews();
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    
+    let slug = slugInput.value;
+    if (!slug) slug = generateSlug(nameInput.value);
+
+    const productData = {
+      name: nameInput.value,
+      slug: slug,
+      description: document.getElementById('description').value,
+      price: parseFloat(document.getElementById('price').value),
+      compare_price: document.getElementById('compare_price').value ? parseFloat(document.getElementById('compare_price').value) : null,
+      category: document.getElementById('category').value,
+      stock: {
+        S: parseInt(document.getElementById('stockS').value),
+        M: parseInt(document.getElementById('stockM').value),
+        L: parseInt(document.getElementById('stockL').value),
+        XL: parseInt(document.getElementById('stockXL').value),
+        XXL: parseInt(document.getElementById('stockXXL').value)
+      },
+      featured: document.getElementById('featured').checked,
+      active: document.getElementById('active').checked,
+      images: uploadedImages
+    };
+
+    let result;
+    if (productId) {
+      result = await supabase.from('products').update(productData).eq('id', productId);
+    } else {
+      result = await supabase.from('products').insert([productData]);
+    }
+
+    if (result.error) {
+      showToast(result.error.message, 'error');
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Product';
+    } else {
+      window.location.href = '/admin/products.html';
+    }
+  });
+}
