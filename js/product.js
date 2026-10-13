@@ -69,10 +69,20 @@ function renderProductDetail(product, container) {
     </div>
   ` : '';
 
+  const galleryControlsHtml = images.length > 1 ? `
+    <div class="gallery-dots">
+      ${images.map((_, i) => `<span class="gallery-dot ${i === 0 ? 'active' : ''}"></span>`).join('')}
+    </div>
+    <div class="gallery-counter-badge" id="galleryCounter">1 / ${images.length}</div>
+    <button type="button" class="gallery-nav-btn prev" id="galleryPrev" aria-label="Previous image">&#8249;</button>
+    <button type="button" class="gallery-nav-btn next" id="galleryNext" aria-label="Next image">&#8250;</button>
+  ` : '';
+
   container.innerHTML = `
     <div class="product-gallery fade-in visible">
       <div id="mainImage" class="product-gallery-main">
         <img src="${images[0]}" alt="${product.name}">
+        ${galleryControlsHtml}
       </div>
       ${thumbnailsHtml}
     </div>
@@ -113,18 +123,102 @@ function renderProductDetail(product, container) {
 }
 
 function setupInteractions(images) {
-  // Thumbnail click
-  if (images.length > 1) {
+  let currentIndex = 0;
+
+  function updateActiveImage(newIndex) {
+    if (newIndex < 0) newIndex = images.length - 1;
+    if (newIndex >= images.length) newIndex = 0;
+    currentIndex = newIndex;
+
     const mainImg = document.querySelector('#mainImage img');
+    if (mainImg) {
+      mainImg.style.opacity = '0.35';
+      mainImg.src = images[currentIndex];
+      setTimeout(() => { mainImg.style.opacity = '1'; }, 80);
+    }
+
+    const counter = document.getElementById('galleryCounter');
+    if (counter) counter.textContent = `${currentIndex + 1} / ${images.length}`;
+
+    const dots = document.querySelectorAll('.gallery-dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+
     const thumbBtns = document.querySelectorAll('#thumbStrip button');
-    
+    thumbBtns.forEach((btn, i) => {
+      btn.classList.toggle('active', i === currentIndex);
+      if (i === currentIndex) {
+        btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+  }
+
+  if (images.length > 1) {
+    // Thumbnails
+    const thumbBtns = document.querySelectorAll('#thumbStrip button');
     thumbBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        thumbBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        mainImg.src = images[btn.dataset.index];
+        updateActiveImage(parseInt(btn.dataset.index, 10));
       });
     });
+
+    // Arrow controls
+    document.getElementById('galleryPrev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateActiveImage(currentIndex - 1);
+    });
+    document.getElementById('galleryNext')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateActiveImage(currentIndex + 1);
+    });
+
+    // Touch Swipe gesture support on mobile
+    const mainGallery = document.getElementById('mainImage');
+    if (mainGallery) {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let isSwiping = false;
+
+      mainGallery.addEventListener('touchstart', (e) => {
+        if (!e.changedTouches || e.changedTouches.length === 0) return;
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+        isSwiping = true;
+      }, { passive: true });
+
+      mainGallery.addEventListener('touchmove', (e) => {
+        if (!isSwiping || !e.changedTouches || e.changedTouches.length === 0) return;
+        const currentX = e.changedTouches[0].clientX;
+        const currentY = e.changedTouches[0].clientY;
+        const diffX = Math.abs(currentX - touchStartX);
+        const diffY = Math.abs(currentY - touchStartY);
+
+        // Lock vertical scrolling if swiping horizontally
+        if (diffX > diffY && diffX > 10) {
+          if (e.cancelable) e.preventDefault();
+        }
+      }, { passive: false });
+
+      mainGallery.addEventListener('touchend', (e) => {
+        if (!isSwiping || !e.changedTouches || e.changedTouches.length === 0) return;
+        isSwiping = false;
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        // Minimum swipe distance of 35px, predominantly horizontal
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+          if (deltaX < 0) {
+            updateActiveImage(currentIndex + 1); // Swiped left -> Next photo
+          } else {
+            updateActiveImage(currentIndex - 1); // Swiped right -> Previous photo
+          }
+        }
+      }, { passive: true });
+    }
   }
   
   // Size selection
