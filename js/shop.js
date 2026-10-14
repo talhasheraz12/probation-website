@@ -87,7 +87,7 @@ function renderProducts(category = 'all') {
 }
 
 // Setup filter button listeners
-document.addEventListener('DOMContentLoaded', () => {
+function initShop() {
   if (document.getElementById('productGrid')) {
     loadProducts();
     
@@ -112,4 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initShop);
+} else {
+  initShop();
+}

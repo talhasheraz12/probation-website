@@ -208,7 +208,11 @@
       }
     }
     
-    document.addEventListener('DOMContentLoaded', loadFeaturedProducts);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadFeaturedProducts);
+    } else {
+      loadFeaturedProducts();
+    }
   </script>
 </body>
 </html>

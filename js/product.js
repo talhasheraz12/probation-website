@@ -7,53 +7,107 @@ let selectedSize = null;
 
 async function loadProduct() {
   const urlParams = new URLSearchParams(window.location.search);
-  const identifier = urlParams.get('slug') || urlParams.get('id');
+  const rawIdentifier = urlParams.get('slug') || urlParams.get('id');
   const container = document.getElementById('productDetailContainer');
   
-  if (!identifier) {
-    container.innerHTML = '<p class="text-error" style="grid-column: 1 / -1; text-align: center;">Product not found.</p>';
+  if (!container) return;
+
+  if (!rawIdentifier) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <p class="text-error" style="font-size: 1.1rem; margin-bottom: 16px;">Product not found.</p>
+        <a href="/shop.html" class="btn btn-outline">Back to Shop</a>
+      </div>
+    `;
     return;
   }
+
+  const identifier = decodeURIComponent(rawIdentifier).trim();
   
   try {
-    let { data, error } = await supabase
+    // 1. Try querying by slug first
+    let product = null;
+    const { data: bySlug, error: slugError } = await supabase
       .from('products')
       .select('*')
       .eq('slug', identifier)
-      .single();
-      
-    if (!data) {
-      const res = await supabase
+      .maybeSingle();
+
+    if (slugError) {
+      console.warn('Slug query error:', slugError);
+    }
+
+    if (bySlug) {
+      product = bySlug;
+    } else {
+      // 2. Fallback: try querying by id (UUID)
+      const { data: byId, error: idError } = await supabase
         .from('products')
         .select('*')
         .eq('id', identifier)
-        .single();
-      data = res.data;
-      error = res.error;
+        .maybeSingle();
+
+      if (idError) {
+        console.warn('ID query error:', idError);
+      }
+      if (byId) {
+        product = byId;
+      }
     }
     
-    if (error || !data) throw error || new Error('Product not found');
+    if (!product) {
+      throw new Error(`Product "${identifier}" could not be found.`);
+    }
     
-    currentProduct = data;
-    document.title = `${data.name} - Probation`;
+    currentProduct = product;
+    document.title = `${product.name} - Probation`;
     
-    renderProductDetail(data, container);
-    loadRelatedProducts(data.category, data.id);
+    renderProductDetail(product, container);
+    loadRelatedProducts(product.category, product.id);
     
   } catch (err) {
     console.error('Error fetching product:', err);
-    container.innerHTML = '<p class="text-error" style="grid-column: 1 / -1; text-align: center;">Failed to load product details.</p>';
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+        <p class="text-error" style="font-size: 1.1rem; margin-bottom: 16px;">Failed to load product details.</p>
+        <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 24px;">${err.message || 'Please check your connection and try again.'}</p>
+        <a href="/shop.html" class="btn btn-primary">Browse All Products</a>
+      </div>
+    `;
   }
 }
 
 function renderProductDetail(product, container) {
   // Limit sizes to S, M, L
   const allowedSizes = ['S', 'M', 'L'];
-  const sizes = (product.sizes || allowedSizes).filter(s => allowedSizes.includes(s));
-  const stock = product.stock || {};
+  let rawSizes = product.sizes;
+  if (typeof rawSizes === 'string') {
+    try { rawSizes = JSON.parse(rawSizes); } catch (e) { rawSizes = allowedSizes; }
+  }
+  const sizes = (Array.isArray(rawSizes) ? rawSizes : allowedSizes).filter(s => allowedSizes.includes(s));
   
-  // Also handle extra images if they exist in DB (assuming an array, or fallback to single)
-  const images = product.images && product.images.length > 0 ? product.images : [product.image_url];
+  let stock = product.stock;
+  if (typeof stock === 'string') {
+    try { stock = JSON.parse(stock); } catch (e) { stock = {}; }
+  }
+  if (!stock || typeof stock !== 'object') stock = {};
+  
+  // Robust image array fallback
+  let images = [];
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    images = product.images.filter(Boolean);
+  } else if (typeof product.images === 'string') {
+    try {
+      const parsed = JSON.parse(product.images);
+      if (Array.isArray(parsed)) images = parsed.filter(Boolean);
+    } catch(e) {}
+  }
+  if (images.length === 0 && product.image_url) {
+    images = [product.image_url];
+  }
+  if (images.length === 0) {
+    images = ['/images/hero/hero-main.webp'];
+  }
   
   const sizeHtml = sizes.map(size => {
     const isOutOfStock = stock[size] === 0;
@@ -314,9 +368,6 @@ function renderSizeGuide(category) {
     </section>
   `;
 }
-  
-  setupInteractions(images);
-}
 
 function setupInteractions(images) {
   let currentIndex = 0;
@@ -486,7 +537,17 @@ async function loadRelatedProducts(category, currentId) {
     if (error) throw error;
     
     if (!data || data.length === 0) {
-      grid.parentElement.style.display = 'none'; // hide section if no related
+      const res = await supabase
+        .from('products')
+        .select('*')
+        .eq('active', true)
+        .neq('id', currentId)
+        .limit(4);
+      data = res.data || [];
+    }
+    
+    if (!data || data.length === 0) {
+      if (grid.parentElement) grid.parentElement.style.display = 'none';
       return;
     }
     
@@ -494,7 +555,7 @@ async function loadRelatedProducts(category, currentId) {
       <div class="product-card fade-in visible">
         <div class="product-card-img">
           <a href="/product.html?slug=${product.slug}">
-            <img src="${product.image_url}" alt="${product.name}" loading="lazy">
+            <img src="${(product.images && product.images[0]) || product.image_url || '/images/hero/hero-main.webp'}" alt="${product.name}" loading="lazy">
           </a>
           ${product.compare_price ? '<span class="product-card-badge">Sale</span>' : ''}
         </div>
@@ -515,4 +576,8 @@ async function loadRelatedProducts(category, currentId) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadProduct);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadProduct);
+} else {
+  loadProduct();
+}
