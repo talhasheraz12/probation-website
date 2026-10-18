@@ -651,12 +651,12 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .size-guide-image{
   border-radius:var(--radius);
   overflow:hidden;
-  background:#050505;
+  background:#ffffff;
   border:1px solid var(--border);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:12px;
+  padding:16px;
   width:100%;
   max-width:100%;
   box-sizing:border-box;

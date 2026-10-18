@@ -314,111 +314,123 @@ function renderSizeGuide(category) {
   const isSweatpants = category === 'sweatpants' || category === 'joggers';
   const isSet = category === 'set';
 
-  const hoodieTable = `
-    <div style="margin-bottom: ${isSet ? '28px' : '0'};">
-      <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">HOODIE SIZE GUIDE</h4>
-      <div class="size-scroll-hint">← Swipe table horizontally for all measurements →</div>
-      <div class="size-table-container">
-        <table class="size-table">
-          <thead>
-            <tr>
-              <th>SIZE</th>
-              <th>CHEST (A)</th>
-              <th>LENGTH (B)</th>
-              <th>SHOULDER (C)</th>
-              <th>SLEEVE LENGTH (D)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="size-col">S</td>
-              <td>23" (58.4 cm)</td>
-              <td>27" (68.6 cm)</td>
-              <td>21" (53.3 cm)</td>
-              <td>33" (83.8 cm)</td>
-            </tr>
-            <tr>
-              <td class="size-col">M</td>
-              <td>24" (61.0 cm)</td>
-              <td>28" (71.1 cm)</td>
-              <td>22" (55.9 cm)</td>
-              <td>34" (86.4 cm)</td>
-            </tr>
-            <tr>
-              <td class="size-col">L</td>
-              <td>25" (63.5 cm)</td>
-              <td>29" (73.7 cm)</td>
-              <td>23" (58.4 cm)</td>
-              <td>35" (88.9 cm)</td>
-            </tr>
-          </tbody>
-        </table>
+  const hoodieBlock = `
+    <div class="size-guide-grid" style="margin-bottom: ${isSet ? '24px' : '0'};">
+      <div>
+        <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">HOODIE SIZE GUIDE</h4>
+        <div class="size-scroll-hint">← Swipe table horizontally for all measurements →</div>
+        <div class="size-table-container">
+          <table class="size-table">
+            <thead>
+              <tr>
+                <th>SIZE</th>
+                <th>CHEST (A)</th>
+                <th>LENGTH (B)</th>
+                <th>SHOULDER (C)</th>
+                <th>SLEEVE LENGTH (D)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="size-col">S</td>
+                <td>23" (58.4 cm)</td>
+                <td>27" (68.6 cm)</td>
+                <td>21" (53.3 cm)</td>
+                <td>33" (83.8 cm)</td>
+              </tr>
+              <tr>
+                <td class="size-col">M</td>
+                <td>24" (61.0 cm)</td>
+                <td>28" (71.1 cm)</td>
+                <td>22" (55.9 cm)</td>
+                <td>34" (86.4 cm)</td>
+              </tr>
+              <tr>
+                <td class="size-col">L</td>
+                <td>25" (63.5 cm)</td>
+                <td>29" (73.7 cm)</td>
+                <td>23" (58.4 cm)</td>
+                <td>35" (88.9 cm)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="size-guide-note">All measurements in inches (cm in brackets). Sleeve length is measured from centre back.</p>
       </div>
-      <p class="size-guide-note">All measurements in inches (cm in brackets). Sleeve length is measured from centre back.</p>
+      <div class="size-guide-image">
+        <img src="/images/size-charts/hoodie-size-guide.webp" alt="Hoodie Measurement Diagram" loading="lazy">
+      </div>
     </div>
   `;
 
-  const sweatpantsTable = `
-    <div>
-      <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">SWEATPANTS SIZE GUIDE</h4>
-      <div class="size-scroll-hint">← Swipe table horizontally for all measurements →</div>
-      <div class="size-table-container">
-        <table class="size-table">
-          <thead>
-            <tr>
-              <th>SIZE</th>
-              <th>WAIST (A)</th>
-              <th>HIP (B)</th>
-              <th>THIGH (C)</th>
-              <th>LEG OPENING (D)</th>
-              <th>LENGTH (E)</th>
-              <th>FRONT RISE (F)</th>
-              <th>BACK RISE (G)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="size-col">S</td>
-              <td>27" (68.6 cm)</td>
-              <td>36" (91.4 cm)</td>
-              <td>22" (55.9 cm)</td>
-              <td>8.5" (21.6 cm)</td>
-              <td>38" (96.5 cm)</td>
-              <td>12" (30.5 cm)</td>
-              <td>15.5" (39.4 cm)</td>
-            </tr>
-            <tr>
-              <td class="size-col">M</td>
-              <td>29" (73.7 cm)</td>
-              <td>38" (96.5 cm)</td>
-              <td>24" (61.0 cm)</td>
-              <td>9" (22.9 cm)</td>
-              <td>40" (101.6 cm)</td>
-              <td>12.5" (31.8 cm)</td>
-              <td>16" (40.6 cm)</td>
-            </tr>
-            <tr>
-              <td class="size-col">L</td>
-              <td>31" (78.7 cm)</td>
-              <td>40" (101.6 cm)</td>
-              <td>26" (66.0 cm)</td>
-              <td>9.5" (24.1 cm)</td>
-              <td>42" (106.7 cm)</td>
-              <td>13" (33.0 cm)</td>
-              <td>16.5" (41.9 cm)</td>
-            </tr>
-          </tbody>
-        </table>
+  const sweatpantsBlock = `
+    <div class="size-guide-grid">
+      <div>
+        <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">SWEATPANTS SIZE GUIDE</h4>
+        <div class="size-scroll-hint">← Swipe table horizontally for all measurements →</div>
+        <div class="size-table-container">
+          <table class="size-table">
+            <thead>
+              <tr>
+                <th>SIZE</th>
+                <th>WAIST (A)</th>
+                <th>HIP (B)</th>
+                <th>THIGH (C)</th>
+                <th>LEG OPENING (D)</th>
+                <th>LENGTH (E)</th>
+                <th>FRONT RISE (F)</th>
+                <th>BACK RISE (G)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="size-col">S</td>
+                <td>27" (68.6 cm)</td>
+                <td>36" (91.4 cm)</td>
+                <td>22" (55.9 cm)</td>
+                <td>8.5" (21.6 cm)</td>
+                <td>38" (96.5 cm)</td>
+                <td>12" (30.5 cm)</td>
+                <td>15.5" (39.4 cm)</td>
+              </tr>
+              <tr>
+                <td class="size-col">M</td>
+                <td>29" (73.7 cm)</td>
+                <td>38" (96.5 cm)</td>
+                <td>24" (61.0 cm)</td>
+                <td>9" (22.9 cm)</td>
+                <td>40" (101.6 cm)</td>
+                <td>12.5" (31.8 cm)</td>
+                <td>16" (40.6 cm)</td>
+              </tr>
+              <tr>
+                <td class="size-col">L</td>
+                <td>31" (78.7 cm)</td>
+                <td>40" (101.6 cm)</td>
+                <td>26" (66.0 cm)</td>
+                <td>9.5" (24.1 cm)</td>
+                <td>42" (106.7 cm)</td>
+                <td>13" (33.0 cm)</td>
+                <td>16.5" (41.9 cm)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="size-guide-note">All measurements in inches (cm in brackets). F = front rise, G = back rise.</p>
       </div>
-      <p class="size-guide-note">All measurements in inches (cm in brackets). F = front rise, G = back rise.</p>
+      <div class="size-guide-image">
+        <img src="/images/size-charts/sweatpants-size-guide.webp" alt="Sweatpants Measurement Diagram" loading="lazy">
+      </div>
     </div>
   `;
 
-  let diagramSrc = '/images/size-charts/hoodie-size-guide.webp';
-  if (isSweatpants) {
-    diagramSrc = '/images/size-charts/sweatpants-size-guide.webp';
-  } else if (isSet) {
-    diagramSrc = '/images/size-charts/full-size-guide.webp';
+  let contentHtml = '';
+  if (isSet) {
+    contentHtml = hoodieBlock + sweatpantsBlock;
+  } else if (isSweatpants) {
+    contentHtml = sweatpantsBlock;
+  } else {
+    contentHtml = hoodieBlock;
   }
 
   return `
@@ -433,14 +445,7 @@ function renderSizeGuide(category) {
         </h3>
         <span class="text-secondary" style="font-size:0.8rem">Official Probation Streetwear Sizing</span>
       </div>
-      <div class="size-guide-grid">
-        <div>
-          ${isSet ? hoodieTable + sweatpantsTable : (isSweatpants ? sweatpantsTable : hoodieTable)}
-        </div>
-        <div class="size-guide-image">
-          <img src="${diagramSrc}" alt="Size Guide Diagram" loading="lazy">
-        </div>
-      </div>
+      ${contentHtml}
     </section>
   `;
 }
