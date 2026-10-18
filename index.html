@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
   
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/images/favicon-192x192.png">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -21,15 +23,20 @@
   <!-- Navigation -->
   <header class="navbar">
     <div class="container navbar-inner">
-      <div class="nav-brand">
-        <a href="/">PROBATION</a>
-      </div>
+      <button class="nav-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <nav class="nav-links">
         <a href="/">Home</a>
         <a href="/shop.html">Shop</a>
         <a href="/about.html">About</a>
         <a href="/contact.html">Contact</a>
       </nav>
+      <div class="nav-brand-center">
+        <a href="/"><img src="/images/logo.png" alt="Probation" class="navbar-logo-img"></a>
+      </div>
       <div class="nav-right">
         <a href="/cart.html" class="cart-link">
           <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -39,11 +46,6 @@
           </svg>
           <span class="cart-badge" id="cartBadge">0</span>
         </a>
-        <button class="nav-toggle" aria-label="Toggle menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </div>
     </div>
   </header>
@@ -99,7 +101,7 @@
         <img src="/images/brand/brand-story.webp" alt="Probation Brand Story" loading="lazy">
       </div>
       <div class="split-content">
-        <h2>PROBATION</h2>
+        <img src="/images/logo.png" alt="Probation" style="height: 48px; width: auto; max-width: 200px; display: block; margin-bottom: 16px;">
         <p>Our philosophy is simple: create bold, unapologetic streetwear for those who dare to stand out. Every piece is a statement.</p>
         <div class="quote">Love's gonna get you killed but pride's gonna be the death of you</div>
       </div>
@@ -123,7 +125,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <h4 class="nav-brand" style="margin-bottom: 8px;">PROBATION</h4>
+          <a href="/"><img src="/images/logo.png" alt="Probation" class="footer-logo-img"></a>
           <p>STYLE. VIBE. REFLECT.</p>
           <p style="margin-top: 8px;">Designed to disrupt.</p>
         </div>
