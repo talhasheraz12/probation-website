@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COD Order Invoice - Probation Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    /* =========================================================
+       PROBATION — COD Order Invoice (Printable A4 / Clean Layout)
+       ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f1115;
+      color: #111827;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      padding: 24px 16px 60px;
+    }
+
+    /* Screen Action Bar (Hidden on Print) */
+    .invoice-toolbar {
+      max-width: 820px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 12px 18px;
+      color: #f4f4f5;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toolbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e4e4e7;
+    }
+
+    .toolbar-badge {
+      background: #dc2626;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+
+    .btn-secondary {
+      background: #27272a;
+      color: #f4f4f5;
+      border-color: #3f3f46;
+    }
+
+    .btn-secondary:hover {
+      background: #3f3f46;
+      color: #ffffff;
+    }
+
+    .btn-print {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    .btn-print:hover {
+      background: #e4e4e7;
+      border-color: #e4e4e7;
+      transform: translateY(-1px);
+    }
+
+    /* The White Printable Invoice Sheet */
+    .invoice-sheet {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #ffffff;
+      color: #111111;
+      border-radius: 8px;
+      padding: 48px 48px 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+      position: relative;
+    }
+
+    /* Top Header Section */
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+    }
+
+    .invoice-title {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: #000000;
+      line-height: 1;
+    }
+
+    .meta-list {
+      font-size: 13px;
+      color: #1f2937;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .meta-list strong {
+      color: #000000;
+      font-weight: 700;
+    }
+
+    /* Brand Badge (Matches Reference Image Style) */
+    .brand-badge {
+      display: flex;
+      border: 2px solid #000000;
+      background: #ffffff;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 60px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .brand-badge-logo {
+      background: #000000;
+      color: #ffffff;
+      width: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .brand-badge-logo img {
+      max-height: 42px;
+      max-width: 48px;
+      object-fit: contain;
+    }
+
+    .brand-badge-content {
+      padding: 6px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 140px;
+    }
+
+    .brand-badge-title {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: #000000;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .brand-badge-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .brand-badge-script {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: #111111;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .brand-badge-tag {
+      font-size: 10px;
+      font-weight: 800;
+      border: 1.5px solid #000000;
+      padding: 1px 5px;
+      border-radius: 2px;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    /* Bill To / Ship To Addresses */
+    .invoice-addresses {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+      padding-top: 16px;
+    }
+
+    .address-col {
+      display: flex;
+      gap: 16px;
+    }
+
+    .address-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .address-body {
+      font-size: 13px;
+      line-height: 1.45;
+      color: #374151;
+    }
+
+    .address-name {
+      font-weight: 700;
+      color: #000000;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    /* Items Table */
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+    }
+
+    .invoice-table thead th {
+      font-size: 13px;
+      font-weight: 700;
+      color: #000000;
+      text-align: left;
+      padding: 10px 0;
+      border-top: 2px solid #000000;
+      border-bottom: 2px solid #000000;
+    }
+
+    .invoice-table thead th.col-qty {
+      text-align: center;
+      width: 70px;
+    }
+
+    .invoice-table thead th.col-price {
+      text-align: right;
+      width: 110px;
+    }
+
+    .invoice-table thead th.col-total {
+      text-align: right;
+      width: 120px;
+    }
+
+    .invoice-table tbody tr td {
+      padding: 16px 0;
+      vertical-align: top;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .invoice-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .item-cell {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .item-thumb {
+      width: 58px;
+      height: 58px;
+      background: #f4f4f5;
+      border-radius: 4px;
+      border: 1px solid #e4e4e7;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #000000;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 3px;
+    }
+
+    .item-sku-size {
+      font-size: 12px;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+
+    .item-sku-size strong {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .barcode-wrap {
+      display: block;
+      margin-top: 4px;
+    }
+
+    .qty-cell {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #000000;
+      padding-top: 18px !important;
+    }
+
+    .qty-cell span {
+      color: #6b7280;
+      font-weight: 400;
+      margin-right: 2px;
+    }
+
+    .price-cell {
+      text-align: right;
+      font-size: 13px;
+      color: #111827;
+      padding-top: 18px !important;
+    }
+
+    .total-cell {
+      text-align: right;
+      font-size: 13px;
+      font-weight: 700;
+      color: #000000;
+      padding-top: 18px !important;
+    }
+
+    /* Notes & Totals Section */
+    .invoice-summary-split {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 32px;
+      margin-bottom: 40px;
+      padding-top: 8px;
+    }
+
+    .notes-box {
+      font-size: 13px;
+    }
+
+    .notes-title {
+      font-weight: 700;
+      color: #000000;
+      margin-bottom: 6px;
+    }
+
+    .notes-content {
+      color: #4b5563;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .cod-callout {
+      border: 1.5px dashed #000000;
+      background: #fafafa;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .cod-callout strong {
+      display: block;
+      color: #dc2626;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .cod-callout p {
+      color: #1f2937;
+      margin: 0;
+    }
+
+    /* Financials Table */
+    .totals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      color: #374151;
+    }
+
+    .totals-row.grand-total {
+      border-top: 2px solid #000000;
+      border-bottom: 2px solid #000000;
+      padding: 10px 0;
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #000000;
+    }
+
+    /* Footer Section */
+    .invoice-footer {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 28px;
+      text-align: center;
+      font-size: 12px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .footer-heading {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000000;
+      margin-bottom: 2px;
+    }
+
+    .footer-sub {
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .footer-brand {
+      font-weight: 800;
+      color: #000000;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-address {
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+
+    .footer-links {
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .social-icon-circle {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #000000;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .social-icon-circle svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    /* Print Specific Media Query */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        color: #000000 !important;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .invoice-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm;
+      }
+
+      .invoice-header,
+      .invoice-addresses,
+      .invoice-table,
+      .invoice-summary-split,
+      .invoice-footer {
+        page-break-inside: avoid;
+      }
+
+      /* Ensure barcodes and crisp borders print accurately */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    /* Mobile Responsive for screen preview */
+    @media (max-width: 640px) {
+      .invoice-sheet {
+        padding: 24px 18px;
+      }
+      .invoice-header {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .invoice-addresses {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .invoice-summary-split {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Toolbar (Hidden when printed) -->
+  <div class="invoice-toolbar no-print">
+    <div class="toolbar-left">
+      <a href="/admin/orders.html" class="btn btn-secondary">
+        &larr; Back to Orders
+      </a>
+      <span class="toolbar-title" id="toolbarOrderTitle">Loading order...</span>
+      <span class="toolbar-badge">COD</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-print" onclick="window.print()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Print Invoice
+      </button>
+    </div>
+  </div>
+
+  <!-- Printable Invoice Card -->
+  <main class="invoice-sheet" id="invoiceSheet">
+    
+    <!-- Top Header -->
+    <header class="invoice-header">
+      <div>
+        <h1 class="invoice-title">Invoice</h1>
+        <div class="meta-list">
+          <div><strong>Invoice No.</strong> <span id="invNumber">#---</span></div>
+          <div><strong>Order Date</strong> <span id="invDate">--/--/----</span></div>
+          <div><strong>Payment</strong> Cash on Delivery (COD)</div>
+          <div><strong>Shipping</strong> Standard Delivery (COD)</div>
+        </div>
+      </div>
+
+      <!-- Streetwear Brand Badge -->
+      <div class="brand-badge">
+        <div class="brand-badge-logo">
+          <img src="/images/logo.png" alt="P" onerror="this.outerHTML='P'">
+        </div>
+        <div class="brand-badge-content">
+          <div class="brand-badge-title">PROBATION</div>
+          <div class="brand-badge-footer">
+            <span class="brand-badge-script">Streetwear</span>
+            <span class="brand-badge-tag">CO</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Bill to & Ship to -->
+    <section class="invoice-addresses">
+      <div class="address-col">
+        <div class="address-label">Bill to</div>
+        <div class="address-body" id="billToBox">
+          <div class="address-name">--</div>
+          <div>--</div>
+          <div>Pakistan</div>
+          <div>--</div>
+        </div>
+      </div>
+      <div class="address-col">
+        <div class="address-label">Ship to</div>
+        <div class="address-body" id="shipToBox">
+          <div class="address-name">--</div>
+          <div>--</div>
+          <div>Pakistan</div>
+          <div>--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Items Table -->
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>Item Description</th>
+          <th class="col-qty">Qty</th>
+          <th class="col-price">Price</th>
+          <th class="col-total">Total</th>
+        </tr>
+      </thead>
+      <tbody id="invoiceItemsTable">
+        <tr>
+          <td colspan="4" style="text-align: center; padding: 30px; color: #6b7280;">Loading order details...</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Notes & Totals Split -->
+    <section class="invoice-summary-split">
+      <div class="notes-box">
+        <div class="notes-title">Notes</div>
+        <div class="notes-content" id="orderNotesText">No customer notes provided.</div>
+        
+        <div class="cod-callout">
+          <strong>Cash on Delivery (COD)</strong>
+          <p>Please collect the exact total amount in cash at the time of delivery.</p>
+        </div>
+      </div>
+
+      <div class="totals-list">
+        <div class="totals-row">
+          <span>Subtotal</span>
+          <span id="subtotalVal">Rs. 0</span>
+        </div>
+        <div class="totals-row">
+          <span>Shipping (COD)</span>
+          <span id="shippingVal">Rs. 500</span>
+        </div>
+        <div class="totals-row grand-total">
+          <span>Total</span>
+          <span id="totalVal">Rs. 0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="invoice-footer">
+      <div class="footer-heading">Thanks for your business!</div>
+      <div class="footer-sub">If you have any questions, please get in touch.</div>
+      
+      <div class="footer-brand">Probation Streetwear</div>
+      <div class="footer-address">Lahore, Pakistan</div>
+      <div class="footer-links">probation-website.vercel.app</div>
+
+      <div class="social-icons">
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/probation.official" target="_blank" class="social-icon-circle" title="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+        </a>
+        <!-- TikTok -->
+        <a href="https://www.tiktok.com/@probation_official" target="_blank" class="social-icon-circle" title="TikTok">
+          <svg viewBox="0 0 24 24">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z"/>
+          </svg>
+        </a>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Script: Load Order from Supabase and render -->
+  <script type="module">
+    import { supabase, formatPrice } from '/js/supabase-config.js';
+
+    // Generate clean SVG barcode matching reference image
+    function renderBarcodeSvg(seedStr = 'PRB') {
+      const bars = [2, 1, 1, 3, 1, 2, 2, 1, 1, 1, 3, 2, 1, 2, 1, 1, 3, 1, 2, 2, 1, 1, 2, 3, 1, 1, 2, 1, 3, 1, 1, 2, 2, 1, 1, 3, 2, 1, 1, 2, 2, 3, 1, 1, 2, 1];
+      let x = 0;
+      let rects = '';
+      bars.forEach((w, idx) => {
+        const width = w * 1.4;
+        if (idx % 2 === 0) {
+          rects += `<rect x="${x}" y="0" width="${width}" height="18" fill="#000000" />`;
+        }
+        x += width + 1;
+      });
+      return `<svg width="${x}" height="18" viewBox="0 0 ${x} 18" xmlns="http://www.w3.org/2000/svg" class="barcode-wrap">${rects}</svg>`;
+    }
+
+    // Format date as DD/MM/YYYY
+    function formatDate(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    async function loadInvoice() {
+      // Auth Guard
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = '/admin/';
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+      const autoPrint = params.get('print') === 'true' || params.get('auto') === '1';
+
+      if (!orderId) {
+        document.getElementById('invoiceItemsTable').innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 40px; color: #dc2626; font-weight: 600;">
+              No order ID specified. Please access this page from the <a href="/admin/orders.html" style="text-decoration: underline;">Orders List</a>.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Fetch order and order items
+      const { data: order, error } = await supabase
+        .from('orders')
+        .select(`*, order_items(*)`)
+        .eq('id', orderId)
+        .single();
+
+      if (error || !order) {
+        console.error('Invoice load error:', error);
+        document.getElementById('invoiceItemsTable').innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 40px; color: #dc2626;">
+              Order not found or access denied.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Toolbar info
+      document.getElementById('toolbarOrderTitle').textContent = `Order #${order.order_number} — ${order.customer_name}`;
+
+      // Header Meta
+      document.getElementById('invNumber').textContent = `#${order.order_number}`;
+      document.getElementById('invDate').textContent = formatDate(order.created_at);
+
+      // Customer Bill To & Ship To
+      const addressHtml = `
+        <div class="address-name">${order.customer_name}</div>
+        <div>${order.shipping_address}</div>
+        <div>${order.city}, Pakistan</div>
+        <div style="margin-top: 4px;">Phone: <strong>${order.customer_phone}</strong></div>
+        ${order.customer_email ? `<div>Email: ${order.customer_email}</div>` : ''}
+      `;
+
+      document.getElementById('billToBox').innerHTML = addressHtml;
+      document.getElementById('shipToBox').innerHTML = addressHtml;
+
+      // Notes
+      if (order.notes) {
+        document.getElementById('orderNotesText').textContent = order.notes;
+      } else {
+        document.getElementById('orderNotesText').textContent = 'Please call before delivery.';
+      }
+
+      // Totals
+      document.getElementById('subtotalVal').textContent = formatPrice(order.subtotal);
+      document.getElementById('shippingVal').textContent = formatPrice(order.shipping_fee || 500);
+      document.getElementById('totalVal').textContent = formatPrice(order.total);
+
+      // Fetch product images for thumbnails
+      const productIds = (order.order_items || []).map(i => i.product_id).filter(Boolean);
+      const productImagesMap = {};
+
+      if (productIds.length > 0) {
+        const { data: prods } = await supabase
+          .from('products')
+          .select('id, images, slug')
+          .in('id', productIds);
+        
+        if (prods) {
+          prods.forEach(p => {
+            if (p.images && p.images.length > 0) {
+              productImagesMap[p.id] = p.images[0];
+            }
+          });
+        }
+      }
+
+      // Render table rows
+      const tbody = document.getElementById('invoiceItemsTable');
+      tbody.innerHTML = '';
+
+      (order.order_items || []).forEach((item, index) => {
+        const tr = document.createElement('tr');
+        const imgSrc = productImagesMap[item.product_id] || '/images/logo.png';
+        const itemBarcode = renderBarcodeSvg(`PRB-${order.order_number}-${index}`);
+        const lineTotal = (item.unit_price || 0) * (item.quantity || 1);
+
+        tr.innerHTML = `
+          <td>
+            <div class="item-cell">
+              <div class="item-thumb">
+                <img src="${imgSrc}" alt="${item.product_name}" onerror="this.src='/images/logo.png'">
+              </div>
+              <div class="item-info">
+                <div class="item-name">${item.product_name}</div>
+                <div class="item-sku-size">
+                  <span>PRB-${item.product_id ? item.product_id.slice(0, 6).toUpperCase() : 'ST'}</span>
+                  &nbsp;&middot;&nbsp;
+                  <strong>Size: ${item.size}</strong>
+                </div>
+                ${itemBarcode}
+              </div>
+            </div>
+          </td>
+          <td class="qty-cell">
+            <span>&times;</span> ${item.quantity}
+          </td>
+          <td class="price-cell">
+            ${formatPrice(item.unit_price)}
+          </td>
+          <td class="total-cell">
+            ${formatPrice(lineTotal)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Auto-print if query param requested
+      if (autoPrint) {
+        setTimeout(() => {
+          window.print();
+        }, 600);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadInvoice);
+  </script>
+</body>
+</html>

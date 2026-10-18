@@ -53,7 +53,10 @@ function renderOrders() {
       <td><span class="status-badge status-${order.status}">${order.status}</span></td>
       <td>${new Date(order.created_at).toLocaleDateString()}</td>
       <td>
-        <button class="btn btn-sm btn-secondary view-order" data-id="${order.id}">View</button>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button class="btn btn-sm btn-secondary view-order" data-id="${order.id}">View</button>
+          <a href="/admin/invoice.html?id=${order.id}" target="_blank" class="btn btn-sm btn-outline" title="Print COD Invoice">Invoice</a>
+        </div>
       </td>
     `;
     tableBody.appendChild(tr);
@@ -145,6 +148,20 @@ function openModal(order) {
         <span>Total</span>
         <span>${formatPrice(order.total)}</span>
       </div>
+    </div>
+
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="/admin/invoice.html?id=${order.id}" target="_blank" class="btn btn-secondary" style="flex: 1; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        View COD Invoice
+      </a>
+      <a href="/admin/invoice.html?id=${order.id}&print=1" target="_blank" class="btn btn-outline" style="white-space: nowrap;">
+        🖨️ Quick Print
+      </a>
     </div>
 
     <div style="background: var(--surface-2); padding: 16px; border-radius: var(--radius);">
