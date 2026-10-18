@@ -164,11 +164,12 @@ function renderProductDetail(product, container) {
     `;
   } else if (isSet) {
     specsListHtml = `
-      <p style="font-weight: 600; color: #fff; margin-bottom: 8px;">Complete 2-Piece Heavyweight Streetwear Set (Hoodie + Sweatpants)</p>
       <ul class="product-specs-list">
+        <li>Complete 2-Piece Heavyweight Streetwear Set (Hoodie + Sweatpants)</li>
         <li>100% Heavy-Weight Cotton (380 GSM)</li>
         <li>Oversized Fit Hoodie with DTF Back Print & Kangaroo Pocket</li>
-        <li>Matching Wide-Leg Sweatpants with Embroidered Hip & Ankle Details</li>
+        <li>Matching Wide-Leg Sweatpants with Embroidered Details</li>
+        <li>Deep Pockets & Elastic Waistband with Flat Drawstrings</li>
       </ul>
       <div class="model-details-badge">
         <strong>Model Details:</strong> The Model is Wearing Size Large; Model Height: 6'1
@@ -243,6 +244,7 @@ function renderSizeGuide(category) {
   const hoodieTable = `
     <div style="margin-bottom: ${isSet ? '28px' : '0'};">
       <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">HOODIE SIZE GUIDE</h4>
+      <div class="size-scroll-hint">← Swipe table horizontally for all measurements →</div>
       <div class="size-table-container">
         <table class="size-table">
           <thead>
@@ -286,6 +288,7 @@ function renderSizeGuide(category) {
   const sweatpantsTable = `
     <div>
       <h4 style="margin-bottom: 12px; font-size: 0.95rem; color: var(--accent); letter-spacing: 0.08em;">SWEATPANTS SIZE GUIDE</h4>
+      <div class="size-scroll-hint">← Swipe table horizontally for all measurements →</div>
       <div class="size-table-container">
         <table class="size-table">
           <thead>
