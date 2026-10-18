@@ -13,6 +13,10 @@ export const SITE = {
   name: 'Probation',
   currency: 'Rs.',
   currencyCode: 'PKR',
+  socials: {
+    instagram: 'https://www.instagram.com/probation.official?mdxt=MWY3endkaHJvam1nZQ%3D%3D&utm_source=qr',
+    tiktok: 'https://www.tiktok.com/@probation_official'
+  }
 };
 
 export function formatPrice(amount) {
