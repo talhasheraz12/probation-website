@@ -8,6 +8,7 @@ import { getCartCount } from './cart.js';
 const navToggle = document.querySelector('.nav-toggle');
 const navLinks = document.querySelector('.nav-links');
 const navOverlay = document.querySelector('.nav-overlay');
+const navClose = document.querySelector('.nav-close');
 
 function closeNav() {
   navToggle?.classList.remove('active');
@@ -23,7 +24,16 @@ navToggle?.addEventListener('click', () => {
   document.body.style.overflow = isOpen ? 'hidden' : '';
 });
 
+// Close button inside the drawer
+navClose?.addEventListener('click', closeNav);
+
+// Overlay tap closes menu
 navOverlay?.addEventListener('click', closeNav);
+
+// Escape key closes menu
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeNav();
+});
 
 // Close nav on link click (mobile)
 navLinks?.querySelectorAll('a').forEach(link => {

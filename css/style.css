@@ -145,6 +145,10 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
   align-items:center;
   justify-content:center;
   z-index:10;
+  pointer-events:none;
+}
+.nav-brand-center a{
+  pointer-events:auto;
 }
 .navbar-logo-img{
   height:38px;
@@ -218,8 +222,13 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .nav-overlay.active{opacity:1;visibility:visible}
 .nav-right{display:flex;align-items:center;gap:16px}
 .nav-toggle{
-  display:flex;flex-direction:column;gap:5px;z-index:250;
-  padding:4px;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;
+  padding:8px;
+  position:relative;z-index:250;
+  background:none;border:none;cursor:pointer;
+  min-width:40px;min-height:40px;
+  -webkit-tap-highlight-color:transparent;
+  flex-shrink:0;
 }
 .nav-toggle span{
   display:block;width:22px;height:2px;background:var(--text);
@@ -228,6 +237,17 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .nav-toggle.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
 .nav-toggle.active span:nth-child(2){opacity:0}
 .nav-toggle.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+/* Close button inside the nav drawer */
+.nav-close{
+  position:absolute;top:20px;right:20px;
+  background:none;border:none;cursor:pointer;
+  font-size:1.75rem;line-height:1;
+  color:var(--text-secondary);
+  padding:4px 8px;
+  transition:color var(--transition);
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-close:hover{color:var(--text)}
 .cart-link{position:relative;display:flex;align-items:center}
 .cart-link svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.5}
 .cart-badge{
@@ -872,15 +892,68 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .fade-in.visible{opacity:1;transform:none}
 
 /* ==========================================
-   RESPONSIVE BREAKPOINTS (Mobile-First)
+   MOBILE FIXES (max-width: 1023px)
    ========================================== */
+@media(max-width:1023px){
+  /* Prevent horizontal scroll globally */
+  html,body{overflow-x:hidden;max-width:100vw}
 
-/* Small devices (576px+) */
-@media(min-width:576px){
-  .form-row{grid-template-columns:1fr 1fr}
-  .cart-item{grid-template-columns:100px 1fr}
-  .admin-stats{grid-template-columns:repeat(2,1fr)}
+  /* Navbar: make sure all 3 elements fit */
+  .navbar-inner{padding:0 12px;box-sizing:border-box}
+  .container{padding:0 16px;box-sizing:border-box}
+
+  /* Logo: slightly smaller on mobile so it doesn't crowd toggles */
+  .navbar-logo-img{height:30px;max-width:110px}
+
+  /* Nav-right: don't let cart push off screen */
+  .nav-right{flex-shrink:0}
+
+  /* Nav-links mobile drawer: safe close button area at top */
+  .nav-links{padding-top:72px}
+
+  /* Sections don't overflow */
+  .section,.hero,.marquee,.product-grid,.split-section,
+  .cart-layout,.checkout-layout,.product-detail{max-width:100%;box-sizing:border-box}
+
+  /* Images never overflow their containers */
+  img{max-width:100%;height:auto}
+
+  /* Hero text smaller on tiny screens */
+  .hero-title{font-size:2rem;word-break:break-word}
+  .hero-subtitle{font-size:1rem}
+
+  /* Product grid: 2 columns on mobile */
+  .product-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+
+  /* Product cards: no overflow */
+  .product-card{overflow:hidden}
+  .product-card-img img{width:100%;aspect-ratio:3/4;object-fit:cover}
+
+  /* Announcement bar: wrap text */
+  .announcement-bar p{white-space:normal;text-align:center;padding:0 12px}
+
+  /* Quote section: full width */
+  .split-section{grid-template-columns:1fr}
+  .split-section .split-img{order:-1}
+
+  /* Cart & checkout stack on mobile */
+  .cart-layout,.checkout-layout{grid-template-columns:1fr}
+
+  /* Admin table scroll */
+  .admin-table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* Footer columns: 2-col then 1-col on very small */
+  .footer-grid{grid-template-columns:repeat(2,1fr)}
 }
+
+/* Extra small (< 400px) single-column fixes */
+@media(max-width:399px){
+  .product-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .navbar-logo-img{height:26px;max-width:90px}
+}
+
+
 
 /* Tablets (768px+) */
 @media(min-width:768px){
@@ -912,6 +985,7 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
   }
   .nav-links a{font-size:.8rem}
   .nav-toggle{display:none}
+  .nav-close{display:none}
   .nav-overlay{display:none!important}
   .product-grid{grid-template-columns:repeat(4,1fr);gap:24px}
   .hero-title{font-size:4rem}
