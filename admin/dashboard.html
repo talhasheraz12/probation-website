@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Dashboard - Probation Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="admin-layout">
@@ -87,36 +87,48 @@
       </div>
     </main>
   </div>
-  <script type="module" src="../js/admin/auth.js"></script>
+  <script type="module" src="/js/admin/auth.js"></script>
   <script type="module">
-    import { supabase, formatPrice } from '../js/supabase-config.js';
+    import { supabase, formatPrice } from '/js/supabase-config.js';
 
     async function loadDashboard() {
-      // Products count
-      const { count: productCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
-      document.getElementById('statProducts').textContent = productCount || 0;
+      try {
+        // Products count
+        const { count: productCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
+        document.getElementById('statProducts').textContent = productCount ?? 0;
 
-      // Orders stats
-      const { data: orders } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
-      if (orders) {
-        document.getElementById('statOrders').textContent = orders.length;
-        document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending').length;
-        const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
-        document.getElementById('statRevenue').textContent = formatPrice(totalRevenue);
-
+        // Orders stats
+        const { data: orders, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+        
         const recentOrdersTable = document.getElementById('recentOrdersTable');
-        orders.slice(0, 10).forEach(order => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>#${order.order_number}</td>
-            <td>${order.customer_name}</td>
-            <td>${order.city}</td>
-            <td>${formatPrice(order.total)}</td>
-            <td><span class="status-badge status-${order.status}">${order.status}</span></td>
-            <td>${new Date(order.created_at).toLocaleDateString()}</td>
-          `;
-          recentOrdersTable.appendChild(tr);
-        });
+        recentOrdersTable.innerHTML = '';
+
+        if (orders && orders.length > 0) {
+          document.getElementById('statOrders').textContent = orders.length;
+          document.getElementById('statPending').textContent = orders.filter(o => o.status === 'pending').length;
+          const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+          document.getElementById('statRevenue').textContent = formatPrice(totalRevenue);
+
+          orders.slice(0, 10).forEach(order => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>#${order.order_number}</td>
+              <td>${order.customer_name}</td>
+              <td>${order.city}</td>
+              <td>${formatPrice(order.total)}</td>
+              <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+              <td>${new Date(order.created_at).toLocaleDateString()}</td>
+            `;
+            recentOrdersTable.appendChild(tr);
+          });
+        } else {
+          document.getElementById('statOrders').textContent = '0';
+          document.getElementById('statPending').textContent = '0';
+          document.getElementById('statRevenue').textContent = formatPrice(0);
+          recentOrdersTable.innerHTML = '<tr><td colspan="6" class="text-center text-secondary" style="padding: 24px;">No orders placed yet.</td></tr>';
+        }
+      } catch (err) {
+        console.error('Error loading dashboard:', err);
       }
     }
     loadDashboard();

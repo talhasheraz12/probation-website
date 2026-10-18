@@ -8,7 +8,8 @@ async function checkAuth() {
   session = data.session;
   user = session?.user || null;
 
-  const isLoginPage = window.location.pathname.endsWith('/admin/') || window.location.pathname.endsWith('/admin/index.html');
+  const path = window.location.pathname;
+  const isLoginPage = path.endsWith('/admin/') || path.endsWith('/admin/index.html') || path.endsWith('/admin');
 
   if (!session && !isLoginPage) {
     window.location.href = '/admin/';
@@ -31,10 +32,15 @@ function setupSidebar() {
     overlay.addEventListener('click', toggleSidebar);
   }
 
+  const currentPath = window.location.pathname.replace('.html', '');
   const links = document.querySelectorAll('.admin-nav a');
   links.forEach(link => {
-    if (window.location.pathname.includes(link.getAttribute('href'))) {
-      link.classList.add('active');
+    const href = link.getAttribute('href');
+    if (href && href !== '#') {
+      const cleanHref = href.replace('.html', '');
+      if (currentPath.endsWith(cleanHref) || currentPath === cleanHref) {
+        link.classList.add('active');
+      }
     }
     
     if (link.id === 'logoutBtn') {
@@ -49,4 +55,8 @@ function setupSidebar() {
 
 await checkAuth();
 
-document.addEventListener('DOMContentLoaded', setupSidebar);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupSidebar);
+} else {
+  setupSidebar();
+}

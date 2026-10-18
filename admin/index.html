@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin Login - Probation</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="admin-login">
@@ -27,7 +27,7 @@
     </div>
   </div>
   <script type="module">
-    import { supabase } from '../js/supabase-config.js';
+    import { supabase } from '/js/supabase-config.js';
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {

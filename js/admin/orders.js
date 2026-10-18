@@ -1,4 +1,4 @@
-import { supabase, formatPrice } from '../supabase-config.js';
+import { supabase, formatPrice } from '/js/supabase-config.js';
 
 let allOrders = [];
 let currentFilter = 'all';

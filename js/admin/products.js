@@ -1,4 +1,4 @@
-import { supabase, formatPrice } from '../supabase-config.js';
+import { supabase, formatPrice } from '/js/supabase-config.js';
 
 // Utilities
 function showToast(message, type = 'success') {
@@ -15,9 +15,9 @@ function generateSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-// Global scope logic depending on current page
-const isProductsPage = window.location.pathname.includes('/admin/products.html');
-const isProductEditPage = window.location.pathname.includes('/admin/product-edit.html');
+// Scope logic depending on current page elements
+const isProductsPage = !!document.getElementById('productsTable');
+const isProductEditPage = !!document.getElementById('productForm');
 
 if (isProductsPage) {
   const tableBody = document.getElementById('productsTable');
@@ -203,15 +203,16 @@ if (isProductEditPage) {
       compare_price: document.getElementById('compare_price').value ? parseFloat(document.getElementById('compare_price').value) : null,
       category: document.getElementById('category').value,
       stock: {
-        S: parseInt(document.getElementById('stockS').value),
-        M: parseInt(document.getElementById('stockM').value),
-        L: parseInt(document.getElementById('stockL').value),
-        XL: parseInt(document.getElementById('stockXL').value),
-        XXL: parseInt(document.getElementById('stockXXL').value)
+        S: parseInt(document.getElementById('stockS').value) || 0,
+        M: parseInt(document.getElementById('stockM').value) || 0,
+        L: parseInt(document.getElementById('stockL').value) || 0,
+        XL: parseInt(document.getElementById('stockXL').value) || 0,
+        XXL: parseInt(document.getElementById('stockXXL').value) || 0
       },
       featured: document.getElementById('featured').checked,
       active: document.getElementById('active').checked,
-      images: uploadedImages
+      images: uploadedImages,
+      image_url: uploadedImages.length > 0 ? uploadedImages[0] : null
     };
 
     let result;
