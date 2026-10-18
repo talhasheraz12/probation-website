@@ -88,7 +88,13 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Stock (Sizes)</label>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <label class="form-label" style="margin-bottom:0;">Stock (Sizes)</label>
+              <span id="setSyncNotice" style="font-size:0.75rem;color:var(--accent);display:none;font-weight:600;">⚡ Auto-synced with Hoodie & Sweatpants</span>
+            </div>
+            <div id="setSyncHelp" style="display:none;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px;">
+              💡 <strong>Bundle Inventory Note:</strong> Sets are composed of 1 Hoodie and 1 Sweatpant. Adding stock to Hoodies or Sweatpants automatically updates available Sets. Entering stock here ensures component stocks are maintained.
+            </div>
             <div class="admin-stock-grid">
               <div>
                 <label style="font-size:0.75rem;font-weight:600;display:block;margin-bottom:4px;">S</label>

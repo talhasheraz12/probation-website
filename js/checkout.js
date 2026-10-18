@@ -61,7 +61,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      // 1. Create order
+      // 1. Fetch latest product inventory & validate (No overselling)
+      const { data: latestProducts, error: fetchErr } = await supabase
+        .from('products')
+        .select('*');
+
+      if (fetchErr) throw fetchErr;
+
+      const prodMap = new Map((latestProducts || []).map(p => [p.id, p]));
+      const hoodieProduct = latestProducts?.find(p => p.category === 'hoodie' || (p.slug && p.slug.includes('hoodie')));
+      const sweatpantProduct = latestProducts?.find(p => p.category === 'sweatpants' || p.category === 'joggers' || (p.slug && p.slug.includes('sweatpants')));
+
+      // Pre-validate stock for every item
+      for (const item of cart) {
+        const isSetItem = item.isSet || (item.size && item.size.includes('Hoodie:'));
+        if (isSetItem) {
+          let hSize = item.hoodieSize;
+          let pSize = item.sweatpantSize;
+          if (!hSize || !pSize) {
+            const hMatch = item.size.match(/Hoodie:\s*([A-Z0-9]+)/i);
+            const pMatch = item.size.match(/Pants:\s*([A-Z0-9]+)|Sweatpants:\s*([A-Z0-9]+)/i);
+            if (hMatch) hSize = hMatch[1].toUpperCase();
+            if (pMatch) pSize = (pMatch[1] || pMatch[2]).toUpperCase();
+          }
+
+          const hStock = Number(hoodieProduct?.stock?.[hSize] ?? 0);
+          const pStock = Number(sweatpantProduct?.stock?.[pSize] ?? 0);
+
+          if (hStock < item.quantity) {
+            showToast(`Sorry, only ${hStock} available for Hoodie size ${hSize}.`, 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+          }
+          if (pStock < item.quantity) {
+            showToast(`Sorry, only ${pStock} available for Sweatpants size ${pSize}.`, 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+          }
+        } else {
+          const prod = prodMap.get(item.productId);
+          const curStock = Number(prod?.stock?.[item.size] ?? 0);
+          if (curStock < item.quantity) {
+            showToast(`Sorry, only ${curStock} left for ${item.name} (${item.size}).`, 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+          }
+        }
+      }
+
+      // 2. Create order in orders table
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -83,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const order_id = orderData.id;
 
-      // 2. Create order items
+      // 3. Create order items
       const orderItems = cart.map(item => ({
         order_id,
         product_id: item.productId,
@@ -99,13 +150,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (itemsError) throw itemsError;
 
-      // 3. Cleanup & Redirect
+      // 4. Safely decrement inventory and sync bundle stock
+      const updatedStockMap = {};
+      latestProducts.forEach(p => {
+        updatedStockMap[p.id] = { ...(p.stock || {}) };
+      });
+
+      for (const item of cart) {
+        const isSetItem = item.isSet || (item.size && item.size.includes('Hoodie:'));
+        if (isSetItem) {
+          let hSize = item.hoodieSize;
+          let pSize = item.sweatpantSize;
+          if (!hSize || !pSize) {
+            const hMatch = item.size.match(/Hoodie:\s*([A-Z0-9]+)/i);
+            const pMatch = item.size.match(/Pants:\s*([A-Z0-9]+)|Sweatpants:\s*([A-Z0-9]+)/i);
+            if (hMatch) hSize = hMatch[1].toUpperCase();
+            if (pMatch) pSize = (pMatch[1] || pMatch[2]).toUpperCase();
+          }
+
+          if (hoodieProduct && updatedStockMap[hoodieProduct.id]) {
+            const curH = Number(updatedStockMap[hoodieProduct.id][hSize] || 0);
+            updatedStockMap[hoodieProduct.id][hSize] = Math.max(0, curH - item.quantity);
+          }
+          if (sweatpantProduct && updatedStockMap[sweatpantProduct.id]) {
+            const curP = Number(updatedStockMap[sweatpantProduct.id][pSize] || 0);
+            updatedStockMap[sweatpantProduct.id][pSize] = Math.max(0, curP - item.quantity);
+          }
+        } else {
+          if (updatedStockMap[item.productId]) {
+            const cur = Number(updatedStockMap[item.productId][item.size] || 0);
+            updatedStockMap[item.productId][item.size] = Math.max(0, cur - item.quantity);
+          }
+        }
+      }
+
+      // Re-sync Set product stock with minimum of hoodie and sweatpant stocks
+      const setProducts = latestProducts.filter(p => p.category === 'set' || (p.slug && p.slug.includes('set')));
+      setProducts.forEach(setProd => {
+        if (hoodieProduct && sweatpantProduct && updatedStockMap[setProd.id]) {
+          ['S', 'M', 'L', 'XL', 'XXL'].forEach(sz => {
+            const h = Number(updatedStockMap[hoodieProduct.id]?.[sz] || 0);
+            const p = Number(updatedStockMap[sweatpantProduct.id]?.[sz] || 0);
+            updatedStockMap[setProd.id][sz] = Math.min(h, p);
+          });
+        }
+      });
+
+      // Persist all updated stocks to Supabase
+      for (const prodId of Object.keys(updatedStockMap)) {
+        try {
+          await supabase.from('products').update({ stock: updatedStockMap[prodId] }).eq('id', prodId);
+        } catch (stockErr) {
+          console.warn('Stock update warning for', prodId, stockErr);
+        }
+      }
+
+      // 5. Cleanup & Redirect
       clearCart();
       window.location.href = `/order-confirmed.html?order=${order_id}`;
 
     } catch (error) {
       console.error('Checkout error:', error);
-      showToast('There was an error placing your order. Please try again.', 'error');
+      showToast(error.message || 'There was an error placing your order. Please try again.', 'error');
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
     }

@@ -36,13 +36,15 @@ if (isProductsPage) {
       const tr = document.createElement('tr');
       const imgUrl = product.images && product.images.length > 0 ? product.images[0] : '';
       const stockTotal = Object.values(product.stock || {}).reduce((a, b) => a + Number(b), 0);
+      const isSet = product.category === 'set' || (product.slug && product.slug.includes('set'));
+      const stockBadge = isSet ? `<br><small style="color:var(--accent);font-size:0.7rem;font-weight:600;">(Auto-synced bundle)</small>` : '';
       
       tr.innerHTML = `
         <td><img src="${imgUrl}" alt="${product.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI1MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzMzMyIvPjwvc3ZnPg=='" /></td>
         <td>${product.name}</td>
         <td style="text-transform:capitalize">${product.category}</td>
         <td>${formatPrice(product.price)}</td>
-        <td>${stockTotal}</td>
+        <td>${stockTotal}${stockBadge}</td>
         <td>
           <label class="toggle-switch">
             <input type="checkbox" class="toggle-featured" data-id="${product.id}" ${product.featured ? 'checked' : ''}>
@@ -112,6 +114,16 @@ if (isProductEditPage) {
     }
   });
 
+  const categorySelect = document.getElementById('category');
+  function updateSetNotice(cat) {
+    const isSet = cat === 'set';
+    const notice = document.getElementById('setSyncNotice');
+    const help = document.getElementById('setSyncHelp');
+    if (notice) notice.style.display = isSet ? 'inline-block' : 'none';
+    if (help) help.style.display = isSet ? 'block' : 'none';
+  }
+  categorySelect?.addEventListener('change', () => updateSetNotice(categorySelect.value));
+
   async function loadProductForEdit(id) {
     const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single();
     if (product) {
@@ -121,6 +133,7 @@ if (isProductEditPage) {
       document.getElementById('price').value = product.price;
       document.getElementById('compare_price').value = product.compare_price || '';
       document.getElementById('category').value = product.category;
+      updateSetNotice(product.category);
       document.getElementById('stockS').value = product.stock?.S || 0;
       document.getElementById('stockM').value = product.stock?.M || 0;
       document.getElementById('stockL').value = product.stock?.L || 0;
@@ -226,8 +239,61 @@ if (isProductEditPage) {
       showToast(result.error.message, 'error');
       saveBtn.disabled = false;
       saveBtn.textContent = 'Save Product';
-    } else {
-      window.location.href = '/admin/products.html';
+      return;
     }
+
+    // Auto-sync bundle inventory:
+    // "if inventory is added in sweatpants it is added to sets quantity too and same with hoodies"
+    try {
+      const { data: allProds } = await supabase.from('products').select('*');
+      if (allProds) {
+        const hoodieProd = allProds.find(p => p.category === 'hoodie' || (p.slug && p.slug.includes('hoodie')));
+        const sweatpantProd = allProds.find(p => p.category === 'sweatpants' || p.category === 'joggers' || (p.slug && p.slug.includes('sweatpants')));
+        const setProd = allProds.find(p => p.category === 'set' || (p.slug && p.slug.includes('set')));
+
+        if (hoodieProd && sweatpantProd && setProd) {
+          const category = productData.category;
+          if (category === 'hoodie' || category === 'sweatpants' || category === 'joggers') {
+            // Updated hoodie or sweatpants -> automatically update set stock to min(hoodie, sweatpants)
+            const syncedSetStock = {};
+            ['S', 'M', 'L', 'XL', 'XXL'].forEach(sz => {
+              const h = Number(hoodieProd.stock?.[sz] || 0);
+              const p = Number(sweatpantProd.stock?.[sz] || 0);
+              syncedSetStock[sz] = Math.min(h, p);
+            });
+            await supabase.from('products').update({ stock: syncedSetStock }).eq('id', setProd.id);
+          } else if (category === 'set') {
+            // Admin directly entered stock for the set -> ensure hoodie and sweatpants have at least that stock
+            const newHoodieStock = { ...(hoodieProd.stock || {}) };
+            const newSweatpantStock = { ...(sweatpantProd.stock || {}) };
+            let hChanged = false;
+            let pChanged = false;
+
+            ['S', 'M', 'L', 'XL', 'XXL'].forEach(sz => {
+              const desired = Number(productData.stock?.[sz] || 0);
+              if (Number(newHoodieStock[sz] || 0) < desired) {
+                newHoodieStock[sz] = desired;
+                hChanged = true;
+              }
+              if (Number(newSweatpantStock[sz] || 0) < desired) {
+                newSweatpantStock[sz] = desired;
+                pChanged = true;
+              }
+            });
+
+            if (hChanged) {
+              await supabase.from('products').update({ stock: newHoodieStock }).eq('id', hoodieProd.id);
+            }
+            if (pChanged) {
+              await supabase.from('products').update({ stock: newSweatpantStock }).eq('id', sweatpantProd.id);
+            }
+          }
+        }
+      }
+    } catch (syncErr) {
+      console.warn('Inventory sync error:', syncErr);
+    }
+
+    window.location.href = '/admin/products.html';
   });
 }

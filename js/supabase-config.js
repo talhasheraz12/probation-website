@@ -77,7 +77,7 @@ const DEFAULT_PRODUCTS = [
     compare_price: 12000,
     category: 'set',
     sizes: ['S', 'M', 'L'],
-    stock: { 'S': 8, 'M': 15, 'L': 20 },
+    stock: { 'S': 10, 'M': 20, 'L': 25 },
     images: [
       '/images/products/tracksuit-set-front.webp',
       '/images/products/hoodie-grey-front.webp',

@@ -440,6 +440,34 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .size-option:hover{border-color:var(--text)}
 .size-option.active{background:var(--text);color:var(--bg);border-color:var(--text)}
 .size-option.out-of-stock{opacity:.3;cursor:not-allowed;text-decoration:line-through}
+.bundle-size-group{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:12px 14px;
+  margin-bottom:12px;
+}
+.bundle-size-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:6px;
+  font-size:0.75rem;
+  font-weight:700;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+}
+.bundle-size-val{
+  color:var(--accent);
+  font-weight:800;
+}
+.bundle-stock-status{
+  font-size:0.8rem;
+  font-weight:600;
+  margin-top:6px;
+  min-height:18px;
+}
 .quantity-selector{
   display:inline-flex;align-items:center;
   border:1px solid var(--border);border-radius:var(--radius);

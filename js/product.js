@@ -3,7 +3,10 @@ import { addToCart } from './cart.js';
 import { showToast } from './main.js';
 
 let currentProduct = null;
+let currentBundleComponents = { hoodie: null, sweatpants: null };
 let selectedSize = null;
+let selectedHoodieSize = null;
+let selectedSweatpantSize = null;
 
 async function loadProduct() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -61,8 +64,23 @@ async function loadProduct() {
     
     currentProduct = product;
     document.title = `${product.name} - Probation`;
+
+    // For set / bundle products, fetch component hoodie & sweatpants to check stock
+    let bundleComponents = { hoodie: null, sweatpants: null };
+    if (product.category === 'set') {
+      try {
+        const { data: allProds } = await supabase.from('products').select('*').eq('active', true);
+        if (allProds) {
+          bundleComponents.hoodie = allProds.find(p => p.category === 'hoodie' || (p.slug && p.slug.includes('hoodie'))) || null;
+          bundleComponents.sweatpants = allProds.find(p => p.category === 'sweatpants' || p.category === 'joggers' || (p.slug && p.slug.includes('sweatpants'))) || null;
+        }
+      } catch (bundleErr) {
+        console.warn('Error fetching bundle components:', bundleErr);
+      }
+    }
+    currentBundleComponents = bundleComponents;
     
-    renderProductDetail(product, container);
+    renderProductDetail(product, container, bundleComponents);
     loadRelatedProducts(product.category, product.id);
     
   } catch (err) {
@@ -77,7 +95,7 @@ async function loadProduct() {
   }
 }
 
-function renderProductDetail(product, container) {
+function renderProductDetail(product, container, bundleComponents) {
   // Limit sizes to S, M, L
   const allowedSizes = ['S', 'M', 'L'];
   let rawSizes = product.sizes;
@@ -109,10 +127,76 @@ function renderProductDetail(product, container) {
     images = ['/images/hero/hero-main.webp'];
   }
   
-  const sizeHtml = sizes.map(size => {
-    const isOutOfStock = stock[size] === 0;
-    return `<button class="size-option ${isOutOfStock ? 'out-of-stock' : ''}" data-size="${size}" ${isOutOfStock ? 'disabled' : ''}>${size}</button>`;
-  }).join('');
+  const isSweatpants = product.category === 'sweatpants' || product.category === 'joggers';
+  const isSet = product.category === 'set';
+
+  let sizeSelectorHtml = '';
+  if (isSet) {
+    const hoodieStock = bundleComponents?.hoodie?.stock || {};
+    const sweatpantStock = bundleComponents?.sweatpants?.stock || {};
+
+    const hoodieOptionsHtml = sizes.map(sz => {
+      const hQty = Number(hoodieStock[sz] ?? 0);
+      const isOut = hQty <= 0;
+      return `<button type="button" class="size-option bundle-hoodie-opt ${isOut ? 'out-of-stock' : ''}" data-size="${sz}" ${isOut ? 'disabled title="Out of stock in Hoodie"' : ''}>${sz}</button>`;
+    }).join('');
+
+    const sweatpantOptionsHtml = sizes.map(sz => {
+      const pQty = Number(sweatpantStock[sz] ?? 0);
+      const isOut = pQty <= 0;
+      return `<button type="button" class="size-option bundle-sweatpant-opt ${isOut ? 'out-of-stock' : ''}" data-size="${sz}" ${isOut ? 'disabled title="Out of stock in Sweatpants"' : ''}>${sz}</button>`;
+    }).join('');
+
+    sizeSelectorHtml = `
+      <div id="sizeSelector" class="size-selector" style="margin-top: 24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="form-label" style="margin-bottom:0;">SELECT BUNDLE SIZES</div>
+          <a href="#sizeGuideSection" class="size-guide-btn-link">Size Guide 📏</a>
+        </div>
+
+        <!-- 1. Hoodie Size -->
+        <div class="bundle-size-group">
+          <div class="bundle-size-header">
+            <span>1. Hoodie Size:</span>
+            <span id="selectedHoodieLabel" class="bundle-size-val">Select size</span>
+          </div>
+          <div class="size-options" id="hoodieSizeOptions">
+            ${hoodieOptionsHtml}
+          </div>
+        </div>
+
+        <!-- 2. Sweatpants Size -->
+        <div class="bundle-size-group">
+          <div class="bundle-size-header">
+            <span>2. Sweatpants Size:</span>
+            <span id="selectedSweatpantLabel" class="bundle-size-val">Select size</span>
+          </div>
+          <div class="size-options" id="sweatpantSizeOptions">
+            ${sweatpantOptionsHtml}
+          </div>
+        </div>
+
+        <div id="bundleComboStatus" class="bundle-stock-status"></div>
+      </div>
+    `;
+  } else {
+    const sizeHtml = sizes.map(size => {
+      const isOutOfStock = Number(stock[size] ?? 0) <= 0;
+      return `<button type="button" class="size-option ${isOutOfStock ? 'out-of-stock' : ''}" data-size="${size}" ${isOutOfStock ? 'disabled' : ''}>${size}</button>`;
+    }).join('');
+
+    sizeSelectorHtml = `
+      <div id="sizeSelector" class="size-selector" style="margin-top: 24px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div class="form-label" style="margin-bottom:0;">SELECT SIZE</div>
+          <a href="#sizeGuideSection" class="size-guide-btn-link">Size Guide 📏</a>
+        </div>
+        <div class="size-options">
+          ${sizeHtml}
+        </div>
+      </div>
+    `;
+  }
   
   const thumbnailsHtml = images.length > 1 ? `
     <div id="thumbStrip" class="product-gallery-thumbs">
@@ -132,9 +216,6 @@ function renderProductDetail(product, container) {
     <button type="button" class="gallery-nav-btn prev" id="galleryPrev" aria-label="Previous image">&#8249;</button>
     <button type="button" class="gallery-nav-btn next" id="galleryNext" aria-label="Next image">&#8250;</button>
   ` : '';
-
-  const isSweatpants = product.category === 'sweatpants' || product.category === 'joggers';
-  const isSet = product.category === 'set';
 
   let specsListHtml = `
     <ul class="product-specs-list">
@@ -197,15 +278,7 @@ function renderProductDetail(product, container) {
         ${specsListHtml}
       </div>
       
-      <div id="sizeSelector" class="size-selector" style="margin-top: 24px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div class="form-label" style="margin-bottom:0;">SELECT SIZE</div>
-          <a href="#sizeGuideSection" class="size-guide-btn-link">Size Guide 📏</a>
-        </div>
-        <div class="size-options">
-          ${sizeHtml}
-        </div>
-      </div>
+      ${sizeSelectorHtml}
       
       <div class="form-label" style="margin-top: 20px;">QUANTITY</div>
       <div class="quantity-selector">
@@ -234,7 +307,7 @@ function renderProductDetail(product, container) {
     ${renderSizeGuide(product.category)}
   `;
   
-  setupInteractions(images);
+  setupInteractions(images, bundleComponents);
 }
 
 function renderSizeGuide(category) {
@@ -372,7 +445,7 @@ function renderSizeGuide(category) {
   `;
 }
 
-function setupInteractions(images) {
+function setupInteractions(images, bundleComponents) {
   let currentIndex = 0;
 
   function updateActiveImage(newIndex) {
@@ -471,15 +544,75 @@ function setupInteractions(images) {
     }
   }
   
-  // Size selection
-  const sizeBtns = document.querySelectorAll('.size-option:not(.out-of-stock)');
-  sizeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      sizeBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedSize = btn.dataset.size;
+  // Size selection logic
+  const isSet = currentProduct?.category === 'set';
+
+  if (isSet) {
+    const hoodieBtns = document.querySelectorAll('.bundle-hoodie-opt:not(.out-of-stock)');
+    const sweatpantBtns = document.querySelectorAll('.bundle-sweatpant-opt:not(.out-of-stock)');
+    const hoodieLabel = document.getElementById('selectedHoodieLabel');
+    const sweatpantLabel = document.getElementById('selectedSweatpantLabel');
+    const comboStatus = document.getElementById('bundleComboStatus');
+    const addBtn = document.getElementById('addToCartBtn');
+    const buyBtn = document.getElementById('buyNowBtn');
+
+    function checkComboAvailability() {
+      if (selectedHoodieSize && selectedSweatpantSize) {
+        const hQty = Number(bundleComponents?.hoodie?.stock?.[selectedHoodieSize] ?? 0);
+        const pQty = Number(bundleComponents?.sweatpants?.stock?.[selectedSweatpantSize] ?? 0);
+        const comboQty = Math.min(hQty, pQty);
+
+        if (comboQty <= 0) {
+          if (comboStatus) comboStatus.innerHTML = `<span style="color:var(--error);">⚠️ The combination of Hoodie (${selectedHoodieSize}) + Sweatpants (${selectedSweatpantSize}) is currently sold out.</span>`;
+          if (addBtn) addBtn.disabled = true;
+          if (buyBtn) buyBtn.disabled = true;
+        } else if (comboQty <= 5) {
+          if (comboStatus) comboStatus.innerHTML = `<span style="color:#f59e0b;">🔥 Only ${comboQty} left in this combination! (Hoodie: ${selectedHoodieSize} / Sweatpants: ${selectedSweatpantSize})</span>`;
+          if (addBtn) addBtn.disabled = false;
+          if (buyBtn) buyBtn.disabled = false;
+        } else {
+          if (comboStatus) comboStatus.innerHTML = `<span style="color:var(--success);">✓ In Stock: Hoodie (${selectedHoodieSize}) & Sweatpants (${selectedSweatpantSize})</span>`;
+          if (addBtn) addBtn.disabled = false;
+          if (buyBtn) buyBtn.disabled = false;
+        }
+      } else if (selectedHoodieSize && !selectedSweatpantSize) {
+        if (comboStatus) comboStatus.innerHTML = `<span style="color:var(--text-secondary);">Selected Hoodie: <strong>${selectedHoodieSize}</strong>. Now please choose your Sweatpants size.</span>`;
+      } else if (!selectedHoodieSize && selectedSweatpantSize) {
+        if (comboStatus) comboStatus.innerHTML = `<span style="color:var(--text-secondary);">Selected Sweatpants: <strong>${selectedSweatpantSize}</strong>. Now please choose your Hoodie size.</span>`;
+      } else {
+        if (comboStatus) comboStatus.innerHTML = ``;
+      }
+    }
+
+    hoodieBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        hoodieBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedHoodieSize = btn.dataset.size;
+        if (hoodieLabel) hoodieLabel.textContent = selectedHoodieSize;
+        checkComboAvailability();
+      });
     });
-  });
+
+    sweatpantBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sweatpantBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedSweatpantSize = btn.dataset.size;
+        if (sweatpantLabel) sweatpantLabel.textContent = selectedSweatpantSize;
+        checkComboAvailability();
+      });
+    });
+  } else {
+    const sizeBtns = document.querySelectorAll('.size-option:not(.out-of-stock)');
+    sizeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sizeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedSize = btn.dataset.size;
+      });
+    });
+  }
   
   // Quantity
   const qtyInput = document.getElementById('qtyInput');
@@ -500,22 +633,68 @@ function setupInteractions(images) {
 }
 
 function handleAddToCart(redirect) {
-  if (!selectedSize) {
-    showToast('Please select a size', 'error');
-    return;
-  }
-  
+  const isSet = currentProduct?.category === 'set';
   const qty = parseInt(document.getElementById('qtyInput').value) || 1;
-  
-  addToCart({
-    productId: currentProduct.id,
-    name: currentProduct.name,
-    slug: currentProduct.slug,
-    image: (currentProduct.images && currentProduct.images[0]) || currentProduct.image_url || '/images/hero/hero-main.webp',
-    size: selectedSize,
-    price: currentProduct.price,
-    quantity: qty
-  });
+
+  if (isSet) {
+    if (!selectedHoodieSize && !selectedSweatpantSize) {
+      showToast('Please select both Hoodie and Sweatpants sizes', 'error');
+      return;
+    }
+    if (!selectedHoodieSize) {
+      showToast('Please select a Hoodie size', 'error');
+      return;
+    }
+    if (!selectedSweatpantSize) {
+      showToast('Please select a Sweatpants size', 'error');
+      return;
+    }
+
+    const hQty = Number(currentBundleComponents?.hoodie?.stock?.[selectedHoodieSize] ?? 0);
+    const pQty = Number(currentBundleComponents?.sweatpants?.stock?.[selectedSweatpantSize] ?? 0);
+    const comboQty = Math.min(hQty, pQty);
+
+    if (comboQty < qty) {
+      showToast(`Only ${comboQty} available for this combination.`, 'error');
+      return;
+    }
+
+    addToCart({
+      productId: currentProduct.id,
+      name: currentProduct.name,
+      slug: currentProduct.slug,
+      image: (currentProduct.images && currentProduct.images[0]) || currentProduct.image_url || '/images/hero/hero-main.webp',
+      size: `Hoodie: ${selectedHoodieSize} / Sweatpants: ${selectedSweatpantSize}`,
+      hoodieSize: selectedHoodieSize,
+      sweatpantSize: selectedSweatpantSize,
+      hoodieProductId: currentBundleComponents?.hoodie?.id,
+      sweatpantProductId: currentBundleComponents?.sweatpants?.id,
+      isSet: true,
+      price: currentProduct.price,
+      quantity: qty
+    });
+  } else {
+    if (!selectedSize) {
+      showToast('Please select a size', 'error');
+      return;
+    }
+
+    const curStock = Number(currentProduct.stock?.[selectedSize] ?? 0);
+    if (curStock < qty) {
+      showToast(`Only ${curStock} available in size ${selectedSize}`, 'error');
+      return;
+    }
+
+    addToCart({
+      productId: currentProduct.id,
+      name: currentProduct.name,
+      slug: currentProduct.slug,
+      image: (currentProduct.images && currentProduct.images[0]) || currentProduct.image_url || '/images/hero/hero-main.webp',
+      size: selectedSize,
+      price: currentProduct.price,
+      quantity: qty
+    });
+  }
   
   if (redirect) {
     window.location.href = '/checkout.html';
