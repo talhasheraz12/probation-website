@@ -5,40 +5,72 @@
 import { getCartCount } from './cart.js';
 
 // --- Mobile Navigation ---
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
-const navOverlay = document.querySelector('.nav-overlay');
-const navClose = document.querySelector('.nav-close');
+function initMobileNav() {
+  const navToggle = document.querySelector('.nav-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  const navOverlay = document.querySelector('.nav-overlay');
+  const navClose = document.querySelector('.nav-close');
 
-function closeNav() {
-  navToggle?.classList.remove('active');
-  navLinks?.classList.remove('active');
-  navOverlay?.classList.remove('active');
-  document.body.style.overflow = '';
+  if (!navToggle || !navLinks) return;
+
+  function openNav() {
+    navLinks.classList.add('active');
+    navToggle.classList.add('active');
+    navOverlay?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeNav() {
+    navLinks.classList.remove('active');
+    navToggle.classList.remove('active');
+    navOverlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function toggleNav(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (navLinks.classList.contains('active')) {
+      closeNav();
+    } else {
+      openNav();
+    }
+  }
+
+  navToggle.addEventListener('click', toggleNav);
+
+  // Close button inside the drawer
+  navClose?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeNav();
+  });
+
+  // Overlay tap closes menu
+  navOverlay?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeNav();
+  });
+
+  // Escape key closes menu
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeNav();
+  });
+
+  // Close nav on link click (mobile)
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', closeNav);
+  });
 }
 
-navToggle?.addEventListener('click', () => {
-  const isOpen = navLinks.classList.toggle('active');
-  navToggle.classList.toggle('active');
-  navOverlay?.classList.toggle('active');
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-});
-
-// Close button inside the drawer
-navClose?.addEventListener('click', closeNav);
-
-// Overlay tap closes menu
-navOverlay?.addEventListener('click', closeNav);
-
-// Escape key closes menu
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeNav();
-});
-
-// Close nav on link click (mobile)
-navLinks?.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', closeNav);
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMobileNav);
+} else {
+  initMobileNav();
+}
 
 // --- Cart Badge ---
 export function updateCartBadge() {
@@ -99,7 +131,7 @@ export function showToast(message, type = 'success', duration = 3000) {
 
 // --- Active Nav Link ---
 const currentPath = window.location.pathname;
-navLinks?.querySelectorAll('a').forEach(link => {
+document.querySelectorAll('.nav-links a').forEach(link => {
   const href = link.getAttribute('href');
   if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
     link.classList.add('active');

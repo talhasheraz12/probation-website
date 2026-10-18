@@ -128,9 +128,8 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 
 /* --- Navigation --- */
 .navbar{
-  position:sticky;top:0;z-index:100;
-  background:rgba(10,10,10,.92);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:1000;
+  background:rgba(10,10,10,.96);
   border-bottom:1px solid var(--border);
   height:var(--nav-height);
 }
@@ -196,14 +195,15 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
   filter:drop-shadow(0 4px 10px rgba(0,0,0,0.7));
 }
 .nav-links{
-  position:fixed;top:0;right:0;width:280px;height:100vh;
+  position:fixed;top:0;right:0;width:280px;max-width:80vw;height:100vh;height:100dvh;
   background:var(--surface);padding:80px 32px 32px;
   display:flex;flex-direction:column;gap:24px;
   transform:translateX(100%);
   transition:transform var(--transition),visibility var(--transition);
-  z-index:200;
+  z-index:1200;
   visibility:hidden;
   pointer-events:none;
+  box-shadow:-8px 0 32px rgba(0,0,0,0.8);
 }
 .nav-links.active{
   transform:translateX(0);
@@ -216,7 +216,7 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 }
 .nav-links a:hover,.nav-links a.active{color:var(--text)}
 .nav-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;
   opacity:0;visibility:hidden;transition:all var(--transition);
 }
 .nav-overlay.active{opacity:1;visibility:visible}
@@ -224,15 +224,16 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .nav-toggle{
   display:flex;flex-direction:column;justify-content:center;gap:5px;
   padding:8px;
-  position:relative;z-index:250;
+  position:relative;z-index:1100;
   background:none;border:none;cursor:pointer;
-  min-width:40px;min-height:40px;
+  min-width:44px;min-height:44px;
   -webkit-tap-highlight-color:transparent;
   flex-shrink:0;
 }
 .nav-toggle span{
   display:block;width:22px;height:2px;background:var(--text);
   transition:all var(--transition);
+  pointer-events:none;
 }
 .nav-toggle.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
 .nav-toggle.active span:nth-child(2){opacity:0}
@@ -241,13 +242,16 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .nav-close{
   position:absolute;top:20px;right:20px;
   background:none;border:none;cursor:pointer;
-  font-size:1.75rem;line-height:1;
-  color:var(--text-secondary);
-  padding:4px 8px;
+  font-size:2rem;line-height:1;
+  color:var(--text);
+  padding:8px;
+  width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
   transition:color var(--transition);
   -webkit-tap-highlight-color:transparent;
+  z-index:1250;
 }
-.nav-close:hover{color:var(--text)}
+.nav-close:hover{color:var(--accent)}
 .cart-link{position:relative;display:flex;align-items:center}
 .cart-link svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.5}
 .cart-badge{
