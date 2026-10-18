@@ -205,7 +205,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 5. Cleanup & Redirect
+      // 5. Send order notification email via Resend (serverless)
+      try {
+        await fetch('/api/send-order-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          body: JSON.stringify({
+            order: {
+              id: order_id,
+              order_number: orderData.order_number,
+              customer_name,
+              customer_phone,
+              customer_email,
+              shipping_address,
+              city,
+              notes,
+              subtotal,
+              shipping_fee: shipping,
+              total
+            },
+            items: orderItems
+          })
+        }).catch(err => console.warn('Email notification error:', err));
+      } catch (emailErr) {
+        console.warn('Email trigger warning:', emailErr);
+      }
+
+      // 6. Cleanup & Redirect
       clearCart();
       window.location.href = `/order-confirmed.html?order=${order_id}`;
 
