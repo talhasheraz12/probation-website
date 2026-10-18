@@ -526,7 +526,8 @@ async function loadRelatedProducts(category, currentId) {
   if (!grid) return;
   
   try {
-    const { data, error } = await supabase
+    // First try: same category, excluding current product
+    let { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('active', true)
@@ -536,6 +537,7 @@ async function loadRelatedProducts(category, currentId) {
       
     if (error) throw error;
     
+    // Fallback: if no same-category results, show any other active products
     if (!data || data.length === 0) {
       const res = await supabase
         .from('products')
@@ -543,6 +545,7 @@ async function loadRelatedProducts(category, currentId) {
         .eq('active', true)
         .neq('id', currentId)
         .limit(4);
+      if (res.error) throw res.error;
       data = res.data || [];
     }
     
