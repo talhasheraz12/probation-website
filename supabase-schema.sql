@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS orders (
   notes TEXT,
   status TEXT DEFAULT 'pending',
   subtotal DECIMAL(10,2) NOT NULL,
-  shipping_fee DECIMAL(10,2) DEFAULT 0,
+  shipping_fee DECIMAL(10,2) DEFAULT 500,
   total DECIMAL(10,2) NOT NULL,
   created_at TIMESTAMPTZ DEFAULT now()
 );

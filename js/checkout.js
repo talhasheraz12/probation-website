@@ -1,4 +1,4 @@
-import { supabase, formatPrice } from './supabase-config.js';
+import { supabase, formatPrice, SITE } from './supabase-config.js';
 import { getCart, getCartTotal, clearCart } from './cart.js';
 import { showToast } from './main.js';
 
@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
   `).join('');
 
   const subtotal = getCartTotal();
-  const shipping = 0; // Free shipping for now
+  const shipping = SITE.shippingFee ?? 500;
   const total = subtotal + shipping;
 
   document.getElementById('checkoutSubtotal').textContent = formatPrice(subtotal);
-  document.getElementById('checkoutShipping').textContent = shipping === 0 ? 'Free' : formatPrice(shipping);
+  document.getElementById('checkoutShipping').textContent = formatPrice(shipping);
   document.getElementById('checkoutTotal').textContent = formatPrice(total);
 
   // Form Submit

@@ -70,8 +70,8 @@
           <span id="cartSubtotal">Rs. 0</span>
         </div>
         <div class="cart-summary-row">
-          <span>Shipping</span>
-          <span>Calculated at checkout</span>
+          <span>Shipping (COD)</span>
+          <span id="cartShipping">Rs. 500</span>
         </div>
         <div class="cart-summary-row total">
           <span>Total</span>
@@ -121,12 +121,13 @@
   <script type="module" src="/js/main.js"></script>
   <script type="module">
     import { getCart, removeFromCart, updateQuantity, getCartTotal } from '/js/cart.js';
-    import { formatPrice } from '/js/supabase-config.js';
+    import { formatPrice, SITE } from '/js/supabase-config.js';
 
     const cartLayout = document.getElementById('cartLayout');
     const emptyCartState = document.getElementById('emptyCartState');
     const cartItemsContainer = document.getElementById('cartItems');
     const cartSubtotalEl = document.getElementById('cartSubtotal');
+    const cartShippingEl = document.getElementById('cartShipping');
     const cartTotalEl = document.getElementById('cartTotal');
 
     function renderCart() {
@@ -166,10 +167,12 @@
         </div>
       `).join('');
 
-      const total = getCartTotal();
-      const formattedTotal = formatPrice(total);
-      cartSubtotalEl.textContent = formattedTotal;
-      cartTotalEl.textContent = formattedTotal;
+      const subtotal = getCartTotal();
+      const shipping = SITE.shippingFee ?? 500;
+      const total = subtotal + shipping;
+      cartSubtotalEl.textContent = formatPrice(subtotal);
+      if (cartShippingEl) cartShippingEl.textContent = formatPrice(shipping);
+      cartTotalEl.textContent = formatPrice(total);
     }
 
     document.addEventListener('click', (e) => {
