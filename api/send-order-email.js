@@ -148,7 +148,7 @@ export default async function handler(req, res) {
 
           <!-- Action Button -->
           <div style="margin-top: 28px; text-align: center;">
-            <a href="https://probation-website.vercel.app/admin/orders.html" style="display: inline-block; background-color: #dc2626; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Open Admin Panel</a>
+            <a href="https://probation.shop/admin/orders.html" style="display: inline-block; background-color: #dc2626; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Open Admin Panel</a>
           </div>
 
         </div>
