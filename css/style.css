@@ -91,6 +91,8 @@ h4{font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .btn-secondary:hover{border-color:var(--text-secondary);background:var(--surface-3)}
 .btn-outline{background:transparent;color:var(--text);border-color:var(--text)}
 .btn-outline:hover{background:var(--text);color:var(--bg)}
+.btn-danger{background:transparent;color:var(--error);border-color:rgba(239,68,68,0.4)}
+.btn-danger:hover{background:var(--error);color:#fff;border-color:var(--error);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--text-secondary);border:none;padding:8px 12px}
 .btn-ghost:hover{color:var(--text)}
 .btn-sm{padding:8px 16px;font-size:.75rem}

@@ -53,9 +53,10 @@ function renderOrders() {
       <td><span class="status-badge status-${order.status}">${order.status}</span></td>
       <td>${new Date(order.created_at).toLocaleDateString()}</td>
       <td>
-        <div style="display: flex; gap: 6px; align-items: center;">
+        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: nowrap;">
           <button class="btn btn-sm btn-secondary view-order" data-id="${order.id}">View</button>
           <a href="/admin/invoice.html?id=${order.id}" target="_blank" class="btn btn-sm btn-outline" title="Print COD Invoice">Invoice</a>
+          <button class="btn btn-sm btn-danger delete-order" data-id="${order.id}" data-number="${order.order_number}" title="Delete Order">Delete</button>
         </div>
       </td>
     `;
@@ -77,11 +78,18 @@ const modalOverlay = document.getElementById('orderModal');
 const closeModalBtn = document.getElementById('closeModal');
 const modalContent = document.getElementById('modalContent');
 
-document.getElementById('ordersTable').addEventListener('click', (e) => {
-  if (e.target.classList.contains('view-order')) {
-    const id = e.target.getAttribute('data-id');
+document.getElementById('ordersTable').addEventListener('click', async (e) => {
+  const viewBtn = e.target.closest('.view-order');
+  const deleteBtn = e.target.closest('.delete-order');
+
+  if (viewBtn) {
+    const id = viewBtn.getAttribute('data-id');
     const order = allOrders.find(o => o.id === id);
     if (order) openModal(order);
+  } else if (deleteBtn) {
+    const id = deleteBtn.getAttribute('data-id');
+    const orderNumber = deleteBtn.getAttribute('data-number');
+    await deleteOrder(id, orderNumber, false);
   }
 });
 
@@ -164,7 +172,7 @@ function openModal(order) {
       </a>
     </div>
 
-    <div style="background: var(--surface-2); padding: 16px; border-radius: var(--radius);">
+    <div style="background: var(--surface-2); padding: 16px; border-radius: var(--radius); margin-bottom: 16px;">
       <h4 style="margin-bottom: 12px;">Update Status</h4>
       <div class="flex" style="gap: 12px;">
         <select id="statusSelect" class="form-select" style="max-width: 200px;">
@@ -176,6 +184,19 @@ function openModal(order) {
         </select>
         <button id="updateStatusBtn" class="btn btn-primary">Update</button>
       </div>
+    </div>
+
+    <div style="padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <span style="font-size: 0.825rem; color: var(--text-muted);">Permanently remove this order from database</span>
+      <button id="modalDeleteBtn" class="btn btn-sm btn-danger" style="display: inline-flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+        Delete Order
+      </button>
     </div>
   `;
 
@@ -202,7 +223,52 @@ function openModal(order) {
     btn.textContent = 'Update';
   });
 
+  document.getElementById('modalDeleteBtn').addEventListener('click', async () => {
+    await deleteOrder(order.id, order.order_number, true);
+  });
+
   modalOverlay.classList.add('active');
 }
 
+async function deleteOrder(id, orderNumber, closeModal = false) {
+  const confirmed = window.confirm(
+    `Are you sure you want to delete Order #${orderNumber}?\n\nThis will permanently remove the order and its items. This action cannot be undone.`
+  );
+  if (!confirmed) return;
+
+  try {
+    // 1. Delete associated order items first to prevent foreign key errors
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .delete()
+      .eq('order_id', id);
+
+    if (itemsError) {
+      console.warn('Warning deleting order_items:', itemsError);
+    }
+
+    // 2. Delete the order record
+    const { error: orderError } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', id);
+
+    if (orderError) throw orderError;
+
+    showToast(`Order #${orderNumber} deleted successfully`);
+
+    // Remove from in-memory array and update table
+    allOrders = allOrders.filter(o => o.id !== id);
+    renderOrders();
+
+    if (closeModal) {
+      modalOverlay.classList.remove('active');
+    }
+  } catch (err) {
+    console.error('Delete order error:', err);
+    showToast(err.message || 'Failed to delete order', 'error');
+  }
+}
+
 fetchOrders();
+
