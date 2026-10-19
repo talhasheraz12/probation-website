@@ -102,7 +102,8 @@
         document.getElementById('statProducts').textContent = productCount ?? 0;
 
         // Orders stats
-        const { data: orders, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+        const { data: rawOrders, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+        const orders = (rawOrders || []).filter(o => o.status !== 'deleted');
         
         const recentOrdersTable = document.getElementById('recentOrdersTable');
         recentOrdersTable.innerHTML = '';

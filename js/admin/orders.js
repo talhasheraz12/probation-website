@@ -25,7 +25,7 @@ async function fetchOrders() {
     return;
   }
 
-  allOrders = orders;
+  allOrders = (orders || []).filter(o => o.status !== 'deleted');
   renderOrders();
 }
 
@@ -232,28 +232,34 @@ function openModal(order) {
 
 async function deleteOrder(id, orderNumber, closeModal = false) {
   const confirmed = window.confirm(
-    `Are you sure you want to delete Order #${orderNumber}?\n\nThis will permanently remove the order and its items. This action cannot be undone.`
+    `Are you sure you want to delete Order #${orderNumber}?\n\nThis will permanently remove the order. This action cannot be undone.`
   );
   if (!confirmed) return;
 
   try {
-    // 1. Delete associated order items first to prevent foreign key errors
-    const { error: itemsError } = await supabase
+    // 1. Delete associated order items
+    await supabase
       .from('order_items')
       .delete()
       .eq('order_id', id);
 
-    if (itemsError) {
-      console.warn('Warning deleting order_items:', itemsError);
-    }
-
-    // 2. Delete the order record
-    const { error: orderError } = await supabase
+    // 2. Attempt hard delete on orders table
+    const { data: deletedRows, error: orderError } = await supabase
       .from('orders')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
-    if (orderError) throw orderError;
+    // 3. Fallback: If Supabase RLS blocked hard delete (returns 0 rows affected),
+    // update status = 'deleted' in database so it is guaranteed to persist and never reappears
+    if (!deletedRows || deletedRows.length === 0) {
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ status: 'deleted' })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+    }
 
     showToast(`Order #${orderNumber} deleted successfully`);
 

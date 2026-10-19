@@ -63,10 +63,12 @@ CREATE POLICY "Admin full products" ON products FOR ALL USING (auth.role() = 'au
 CREATE POLICY "Public insert orders" ON orders FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admin view orders" ON orders FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "Admin update orders" ON orders FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Admin delete orders" ON orders FOR DELETE USING (auth.role() = 'authenticated');
 
--- 7. Order Items Policies (Customers can insert items, Admin can view)
+-- 7. Order Items Policies (Customers can insert items, Admin can view and delete)
 CREATE POLICY "Public insert order_items" ON order_items FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admin view order_items" ON order_items FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Admin delete order_items" ON order_items FOR DELETE USING (auth.role() = 'authenticated');
 
 -- 8. Storage Bucket for Product Images
 -- In Supabase Dashboard: Go to Storage -> New Bucket -> Name it "product-images" -> Make it Public!

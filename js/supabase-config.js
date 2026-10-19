@@ -271,9 +271,18 @@ function createMockClient() {
         },
         async delete() {
           const current = getLocalData(tableName, []);
+          const deleted = current.filter(item => data.some(d => d.id === item.id));
           const remaining = current.filter(item => !data.some(d => d.id === item.id));
           setLocalData(tableName, remaining);
-          return { error: null };
+          return {
+            data: deleted,
+            error: null,
+            select() {
+              return {
+                then: (cb) => cb({ data: deleted, error: null })
+              };
+            }
+          };
         }
       };
 
